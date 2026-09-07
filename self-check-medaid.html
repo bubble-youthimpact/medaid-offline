@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Symptom Self-Check — MEDAID</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="theme-color" content="#156569">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MEDAID">
+<style>
+  .mck-back-nav{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size:13px;
+    color:#63605A;
+    text-decoration:none;
+    padding: 16px 16px 0;
+  }
+</style>
+</head>
+<body>
+<a class="mck-back-nav" href="./index.html">&larr; Back to Home</a>
+<link rel="stylesheet" href="./fonts/fonts.css">
+
+<style>
+  /* Everything is scoped under .mck-widget so this can never restyle
+     the host page — Bubble's HTML element is not sandboxed, and a
+     <style> tag applies document-wide regardless of where it sits in
+     the DOM, so bare `body`, `html`, or `*` selectors would leak out. */
+
+  .mck-widget, .mck-widget *{
+    box-sizing: border-box;
+  }
+
+  .mck-widget{
+    --paper: #FFFFFF;
+    --card: #FFFFFF;
+    --ink: #2B2A28;
+    --ink-soft: #63605A;
+    --sage: #5D7F63;
+    --sage-soft: #E4EBE2;
+    --clay: #B5654F;
+    --clay-soft: #F3E4DF;
+    --maroon: #7A2E2E;
+    --maroon-soft: #EFD9D8;
+    --amber: #B9762F;
+    --amber-soft: #F3E5D1;
+    --gold: #A69433;
+    --gold-soft: #F0ECD3;
+    --purple: #156569;
+    --line: #DEDAD0;
+    --radius: 14px;
+
+    /* urgency badge palette */
+    --u-nonurgent-soft: #BFE1F6;
+    --u-nonurgent-text: #1F5C7A;
+    --u-semiurgent-soft: #D4EDBC;
+    --u-semiurgent-text: #4B7A2F;
+    --u-urgent-soft: #FFE5A0;
+    --u-urgent-text: #8A6A1F;
+    --u-emergency-soft: #FFC8AA;
+    --u-emergency-text: #A6502A;
+    --u-resus-soft: #FFCFC9;
+    --u-resus-text: #A13A32;
+
+    display: block;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    container-type: inline-size;
+    container-name: mck-root;
+  }
+
+  .mck-widget .eyebrow{
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 4px;
+  }
+
+  .mck-widget h1{
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 14px;
+    line-height: 1.25;
+  }
+
+  .mck-widget .disclaimer{
+    background: var(--maroon-soft);
+    border: 1px solid var(--maroon);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 22px;
+  }
+
+  .mck-widget .disclaimer strong{
+    color: var(--maroon);
+  }
+
+  .mck-widget .step-label{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin: 0 0 4px;
+  }
+
+  .mck-widget .step-instructions{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+  }
+
+  .mck-widget .chip-group{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .mck-widget .chip{
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: var(--ink);
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .mck-widget .chip.selected{
+    background: var(--purple);
+    border-color: var(--purple);
+    color: #fff;
+  }
+
+  .mck-widget .symptom-group{
+    margin-bottom: 18px;
+  }
+
+  .mck-widget .symptom-group-title{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+
+  .mck-widget .actions{
+    margin-top: 20px;
+    display:flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .mck-widget .btn,
+  .mck-widget .btn:hover,
+  .mck-widget .btn:focus,
+  .mck-widget .btn:active,
+  .mck-widget .btn:visited{
+    font-family: inherit !important;
+    font-size: 14px !important;
+    border-radius: 10px !important;
+    padding: 10px 16px !important;
+    cursor: pointer !important;
+    border: 1px solid var(--line) !important;
+    background: var(--card) !important;
+    background-color: var(--card) !important;
+    color: var(--ink) !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: none !important;
+  }
+
+  .mck-widget .btn.primary,
+  .mck-widget .btn.primary:hover,
+  .mck-widget .btn.primary:focus,
+  .mck-widget .btn.primary:active,
+  .mck-widget .btn.primary:visited{
+    background: var(--purple) !important;
+    background-color: var(--purple) !important;
+    border-color: var(--purple) !important;
+    color: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .mck-widget .btn:disabled{
+    opacity: 0.4;
+    cursor: default !important;
+  }
+
+  .mck-widget .results-summary{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+  }
+
+  .mck-widget .result-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+
+  .mck-widget .result-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .mck-widget .result-name{
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    flex: 1 1 auto;
+  }
+
+  .mck-widget .urgency-pill{
+    display:inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .mck-widget .urgency-resuscitation{ background: var(--u-resus-soft); color: var(--u-resus-text); }
+  .mck-widget .urgency-emergency{ background: var(--u-emergency-soft); color: var(--u-emergency-text); }
+  .mck-widget .urgency-urgent{ background: var(--u-urgent-soft); color: var(--u-urgent-text); }
+  .mck-widget .urgency-semi{ background: var(--u-semiurgent-soft); color: var(--u-semiurgent-text); }
+  .mck-widget .urgency-non{ background: var(--u-nonurgent-soft); color: var(--u-nonurgent-text); }
+
+  @container mck-root (max-width: 480px){
+    .mck-widget .result-head{
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .mck-widget .urgency-pill{
+      order: -1;
+    }
+  }
+
+  .mck-widget .match-tag{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 6px 0 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .mck-widget details{
+    margin-top: 10px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+
+  .mck-widget details:first-of-type{
+    margin-top: 12px;
+  }
+
+  .mck-widget summary{
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    list-style: none;
+  }
+
+  .mck-widget summary::-webkit-details-marker{ display:none; }
+
+  .mck-widget summary::before{
+    content: "▸ ";
+    color: var(--ink-soft);
+  }
+
+  .mck-widget details[open] summary::before{
+    content: "▾ ";
+  }
+
+  .mck-widget .section-body{
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 8px;
+  }
+
+  .mck-widget .section-body p{
+    margin: 0 0 10px;
+  }
+
+  .mck-widget .section-body p:last-child{
+    margin-bottom: 0;
+  }
+
+  .mck-widget .section-body ul{
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  .mck-widget .section-body li{
+    margin-bottom: 8px;
+  }
+
+  .mck-widget .section-body li:last-child{
+    margin-bottom: 0;
+  }
+
+  .mck-widget .no-results{
+    font-size: 14px;
+    color: var(--ink-soft);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+
+  .mck-widget .save-note{
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+</style>
+
+<div class="mck-widget" id="mck-root">
+  <p class="eyebrow">Self Check</p>
+  <h1>Symptom Self-Check</h1>
+  <div class="disclaimer">
+    <strong>This is not a diagnosis.</strong> This tool is for general, educational self-check purposes only and does not replace professional medical care. If this is a medical emergency, seek immediate help from a doctor, clinic, or emergency service.
+  </div>
+
+  <div id="mck-step-category"></div>
+  <div id="mck-step-symptom" style="display:none;"></div>
+  <div id="mck-step-results" style="display:none;"></div>
+</div>
+
+<script>
+(function(){
+  const TAXONOMY = {"Whole Body/Systemic": ["High, sudden fever", "Severe headache/body aches", "Chronic fever", "Cough or rapid breathing", "Fatigue", "Pale skin/dizziness", "Unexplained weight loss", "Joint pain/rashes"], "Respiratory/Chest": ["Chronic shortness of breath", "Acute shortness of breath", "Sudden wheezing/tightness", "Dry, hacking cough", "Cough w/ phlegm or blood"], "Cardiovascular": ["Sudden central chest pain", "Chest tightness from dust/mold/cold air", "Leg pain while walking (stops at rest)", "Chronic irregular heartbeats", "Asymptomatic"], "Stomach/Intestines": ["Sudden, watery \"rice-water\" stool", "Rapid dehydration", "Acute diarrhea w/ blood, mucus, stomach cramps", "Upper abdominal pain", "Lower abdominal pain", "Blood in stool", "Swollen belly or liver/bladder issues"], "Skin": ["Painless neck or armpit lumps", "Sore refusing to heal", "Painless expanding skin wound", "Dark spot/stripe on hand/foot/nail", "Butterfly rash on cheeks", "Painful lump in mouth/jawline", "Hard painless lump in breast", "Bite site complications", "Yellowing of skin/eyes"], "Vision/Eyes": ["Cloudy/blurry vision", "Tunnel vision", "Night blindness", "Sudden eye pain", "Chronic redness", "Watery/yellow discharge"], "Muscular/Neurological": ["Inability to open mouth, stiff neck", "Muscle twitching, heavy sweating", "Pinpoint pupils", "Sudden weakness/numbness on one side of body", "Disputed sleep cycles w/ confusion", "Sudden confusion, slurred speech", "Seizures/convulsions"], "Maternal/Bleeding": ["High blood pressure during pregnancy", "Heavy bleeding", "Bleeding from gums, nose, or wounds after a bite"], "Fluid/Metabolism Changes": ["Extreme dehydration, constant hunger", "Drastic decrease in urine output", "Swelling legs", "Puffy eyes"]};
+
+  const RECORDS = [{"name": "Acral Lentiginous Melanoma", "categories": ["Skin"], "symptoms": ["Sore refusing to heal", "Painless expanding skin wound", "Dark spot/stripe on hand/foot/nail"], "urgency": "Urgent", "whatIsIt": ["A rare but serious type of skin cancer that forms on parts of the body that do not usually get sun exposure.", "Unlike standard skin cancers, it is most frequently found on the soles of the feet, the palms of the hands, or under the fingernails and toenails.", "It is the most common form of melanoma found in people with darker skin complexions."], "doIHaveIt": ["Do you have a new or changing brown or black stripe running vertically (lengthwise) down your fingernail or toenail?", "Is the dark pigment in your nail spreading onto the surrounding skin or cuticle (this is a major warning sign called \"Hutchinson's sign\")?", "Do you have a flat, dark patch on the sole of your foot or palm of your hand that has irregular borders or varied colors (shades of tan, brown, or black)?", "Has a spot on your foot or hand recently started to thicken, itch, or develop into an open sore that refuses to heal?", "Has a \"bruise\" under your nail or on your foot persisted for more than a few weeks without growing out or fading like a normal injury would?"], "whatShouldIDo": ["Do not try to cut, scrape, or treat the spot at home. It is a deep tissue skin change, not an infection, so home remedies or drawing salves will not work.", "Keep a visual record: Take a picture or draw the exact size and shape of the spot. Check it once every two weeks to see if it is expanding, changing shape, or darkening."], "whenToSeeDoctor": ["Plan a trip to a clinic if the dark patch or nail stripe grows larger over a few weeks, starts bleeding, lifts the nail up, or if a sore forms on the spot that refuses to heal."]}, {"name": "Acute Angle-Closure Glaucoma", "categories": ["Vision/Eyes"], "symptoms": ["Sudden eye pain", "Cloudy/blurry vision"], "urgency": "Emergency (Very Urgent)", "whatIsIt": ["A sudden, dangerous buildup of fluid pressure inside the eyeball"], "doIHaveIt": ["Is the intense, throbbing eye pain spreading to cause a severe headache on the same side of your face?", "Does the eye look visibly bloodshot and red, and the clear front part of the eye (the cornea) may look hazy or cloudy instead of bright?", "Is your vision suddenly blurry or do you see bright, rainbow-colored halos or rings around lights?", "Is the pain causing nausea or vomiting?"], "whatShouldIDo": ["Immediately try to find a professional.", "Do not rub or put pressure on the eyeball.", "Do not take allergy medications or cold medicines, as these can accidentally widen your pupil and make the fluid blockage even worse."], "whenToSeeDoctor": ["Immediately"]}, {"name": "Acute Appendicitis", "categories": ["Stomach/Intestines"], "symptoms": ["Lower abdominal pain"], "urgency": "Emergency (Very Urgent)", "whatIsIt": ["A sudden, severe infection and inflammation of the appendix, a small pouch attached to your large intestine.", "If left untreated, the appendix can stretch and burst within 24 to 72 hours, spreading a life-threatening infection throughout your entire abdomen."], "doIHaveIt": ["The Path of Pain: Did the pain start as a dull ache around your belly button? Is the pain moving down and settling intensely in the lower right side of your belly?", "The \"Rebound\" Pain Test: If you press firmly on the lower right side of your belly for a few seconds and then suddenly let go, does the pain sharply worsen when you release the pressure?", "Movement Aggravation: Does walking, coughing, or bumping down a step cause excruciating pain in the lower right abdomen?", "Nausea and Fever: Do you have a low fever, nausea, and a total loss of appetite?"], "whatShouldIDo": ["Do not eat or drink anything. If you need surgery, having food or water in your stomach makes it much more dangerous.", "NEVER use a heating pad on your stomach, and NEVER take laxatives or pain relievers. Heat and laxatives increase the pressure in your intestines and can cause a swollen appendix to burst instantly.", "Apply a cold ice pack wrapped in a cloth to the area to numb the pain slightly while you get help."], "whenToSeeDoctor": ["Seek a professional immediately when belly pain migrates to the lower right side and makes it too painful to stand up straight or walk.", "If the pain suddenly disappears completely after being agonizing, this is a major warning sign that the appendix may have burst. Get emergency help right away."]}, {"name": "Acute Asthma Attack", "categories": ["Respiratory/Chest"], "symptoms": ["Sudden wheezing/tightness"], "urgency": "Emergency (Very Urgent)", "whatIsIt": ["A sudden, intense flare-up where the airways in the lungs severely constrict, swell closed, and clog with thick mucus.", "During an acute attack, the body cannot move enough oxygen into the blood or get carbon dioxide out.", "If the airway tightens completely, it can cause respiratory arrest and death."], "doIHaveIt": ["Are you so breathless that you cannot speak a full sentence and have to stop to gasp for air after just two or three words?", "When you look in a mirror or look at the patient, is the skin sucking in deeply between the ribs or at the base of the neck with every single breath?", "Has the loud, whistling wheezing suddenly stopped, but you are still gasping and struggling just as hard? (Warning: A \"silent chest\" means no air is moving at all)."], "whatShouldIDo": ["Sit them upright immediately: Lean them forward slightly. Never let them lie down, which restricts lung expansion.", "Remove environmental triggers: Move them away from cooking fire smoke, tobacco smoke, dust, chemicals, or cold air. Open a window if the indoor air is stagnant or smoky.", "Loosen clothing: Unbutton tight collars, belts, or tight shirts that compress the chest or neck.", "Keep them calm: Panic worsens the muscle tightening in the throat and chest. Breathe calmly with them to help them pace their breaths.", "If an inhaler is nearby: Administer their emergency reliever inhaler (usually a fast-acting bronchodilator like Salbutamol/Albuterol). In an acute emergency, give 2 to 4 puffs immediately, repeating every few minutes if help is far away."], "whenToSeeDoctor": ["Immediately. Do not wait to see if the attack passes on its own. Arrange immediate travel to a clinic or hospital if:", "The person is struggling to speak, or their chest/neck is pulling inward with breaths.", "An emergency rescue inhaler does not provide clear relief within 15 minutes.", "The person's lips, tongue, or fingernail beds look pale, blue, or gray (this means their vital organs are starving for oxygen).", "The person becomes drowsy, confused, or stops struggling to breathe. This is a sign their muscles are giving out and they are about to lose consciousness."]}, {"name": "African Trypanosomiasis (Sleeping Sickness)", "categories": ["Whole Body/Systemic", "Muscular/Neurological"], "symptoms": ["High, sudden fever", "Fatigue", "Unexplained weight loss", "Disputed sleep cycles w/ confusion", "Severe headache/body aches"], "urgency": "Urgent", "whatIsIt": ["A parasite infection transmitted to humans through the bite of an infected tsetse fly.", "It is highly geographic, primarily found in rural, agricultural, and hunting communities in sub-Saharan Africa.", "Left untreated, the parasite gradually moves from your blood into your brain, causing irreversible neurological damage and death."], "doIHaveIt": ["Stage 1 (Blood Stage): \nDid a painful, red sore form where you were bitten a few weeks after a fly bite?\nWas this followed by a recurring fever, severe muscle and joint aches, and noticeably swollen, painful lymph nodes (lumps) at the back of your neck?", "Stage 2 (Brain Stage): \nDo you have extreme sleepiness during the day, and can't fall asleep at night? \nAre you experiencing internal confusion, slurred speech, unsteadiness while walking, or sudden changes in personality?"], "whatShouldIDo": ["Because this is a complex parasite, there are no home remedies, herbs, or over-the-counter medicines that can cure it. It requires specific prescription antiparasitic medications.", "Keep the patient safe from accidents during periods of severe confusion or sudden daytime sleepiness."], "whenToSeeDoctor": ["If you live in or have traveled to a tsetse fly region and develop an inverted sleep schedule (sleeping all day, awake all night) accompanied by a chronic fever or confusion, you must travel to a clinical center for a blood or fluid test."]}, {"name": "Asthma", "categories": ["Respiratory/Chest", "Cardiovascular"], "symptoms": ["Sudden wheezing/tightness", "Dry, hacking cough", "Chest tightness from dust/mold/cold air"], "urgency": "Urgent", "whatIsIt": ["A long-term condition where your lung's breathing tubes are highly sensitive.", "When exposed to triggers (like dust, smoke, cold air, or physical effort), these tubes swell up, tighten, and fill with thick mucus, making it incredibly difficult to get air in and out."], "doIHaveIt": ["Do you experience a frequent, high-pitched whistling sound (wheezing) when you breathe out?", "Does your chest regularly feel heavy and tight, as if a tight band is wrapped around it, particularly during cold weather or physical effort?", "Do you have a dry, persistent cough that consistently wakes you up in the middle of the night or worsens when you exert yourself?"], "whatShouldIDo": ["Identify and remove the trigger immediately: Get away from any cooking smoke, dust, animal fur, or cold air.", "Sit completely upright: Never let someone having an asthma attack lie down, as this crushes their lung capacity. Have them sit up, lean forward slightly, and rest their elbows on a table to open their airway.", "The Steam/Warm Water Method: If prescription inhalers are completely unavailable, having the person breathe in warm, humid air or drink small sips of warm water can help relax the tight airway muscles slightly."], "whenToSeeDoctor": ["Seek immediate emergency medical help if a breathing flare-up does not improve after resting, if the skin around the ribs or neck sucks in deeply during breaths, or if the person's lips, tongue, or fingernails start turning a pale blue or gray color (a sign of severe oxygen starvation)."]}, {"name": "Biomass Smoke Inhalation / Chronic Lung Disease", "categories": ["Respiratory/Chest", "Cardiovascular"], "symptoms": ["Chronic shortness of breath", "Chest tightness from dust/mold/cold air"], "urgency": "Semi-Urgent", "whatIsIt": ["Progressive, permanent damage to lung tissue caused by breathing in heavy smoke from burning wood, charcoal, crop residue, or dung in poorly ventilated indoor cookstoves.", "It mimics smoking damage but primarily affects women in developing rural areas."], "doIHaveIt": ["Have you spent years cooking indoors with open biomass fires, woodstoves, or charcoal without an exhaust chimney?", "Have you developed a persistent, daily cough that brings up thick mucus, alongside a slow, gradual loss of breath during basic tasks like carrying water?", "Do your chest and lungs frequently feel irritated, heavy, or burn after preparing daily meals?"], "whatShouldIDo": ["Modify the cooking environment immediately: If you cannot get a modern stove, always cook outdoors or right next to an open door/window, and build a basic mud pipe chimney to vent smoke outside.", "Keep children completely away from the active cooking area to protect their developing lungs from early damage.", "Practice deep breathing exercises daily to help clear trapped mucus from your airways."], "whenToSeeDoctor": ["Visit a clinic if you find yourself getting short of breath doing tasks that used to be easy, or if your morning cough begins bringing up dark mucus or traces of blood."]}, {"name": "Buruli Ulcer", "categories": ["Skin"], "symptoms": ["Painless neck or armpit lumps", "Sore refusing to heal", "Painless expanding skin wound"], "urgency": "Semi-Urgent", "whatIsIt": ["A neglected tropical skin and bone infection caused by a bacterium related to tuberculosis.", "It destroys fat and skin tissue, creating massive, open wounds that lead to permanent limb deformities if untreated."], "doIHaveIt": ["Did you notice a firm, completely painless lump or swollen area form on your arm or leg, often after spending time near slow-moving water or mud?", "Has that painless swelling broken open into a large, deep ulcer with a yellowish-white center and scalloped, hollowed-out edges?", "Is the wound remarkably painless and free of fever, even though it keeps expanding across your skin?"], "whatShouldIDo": ["Do not apply traditional caustic herbs, battery acid, or hot stones. These worsen the deep tissue destruction caused by the bacterial toxin.", "Keep the ulcer covered with a clean, dry cloth to prevent dirt and flies from causing a secondary, painful bacterial infection.", "Understand that this requires a specific 8-week course of dual oral antibiotics (Rifampicin + Clarithromycin) prescribed by a health post."], "whenToSeeDoctor": ["Seek a health worker as soon as a painless lump breaks open or continues expanding. Early antibiotic treatment prevents the infection from reaching the underlying bone and causing permanent disability."]}, {"name": "Cataracts", "categories": ["Vision/Eyes"], "symptoms": ["Cloudy/blurry vision"], "urgency": "Non-Urgent", "whatIsIt": ["A gradual, painless clouding of the natural clear lens inside your eye.", "It is the leading cause of blindness in low-income regions, completely curable via a brief, standard surgery."], "doIHaveIt": ["Has your vision slowly become blurry, foggy, or dim over several years, as if you are permanently looking through a dirty piece of glass?", "Do you struggle to see clearly at night, or find that bright sunlight or oncoming headlights create an overwhelming, blinding glare?", "If someone looks closely at your eye, does the black center (pupil) look cloudy, gray, or milky-white instead of solid black?"], "whatShouldIDo": ["When outdoors in bright sunlight, wear a wide-brimmed hat to protect your eyes from UV rays, which accelerate cataract growth.", "Optimize indoor lighting by placing lamps or candles directly next to what you are trying to read or work on.", "Reassure the individual that this is not permanent blindness; visual loss can be fully reversed once surgical access is available."], "whenToSeeDoctor": ["Seek care when the cloudiness prevents you from safely working, farming, cooking, or walking independently. Look out for local mobile surgical eye camps, which frequently perform these operations for free."]}, {"name": "Chagas Disease", "categories": ["Whole Body/Systemic", "Cardiovascular", "Stomach/Intestines"], "symptoms": ["Chronic fever", "Chronic irregular heartbeats"], "urgency": "Semi-Urgent", "whatIsIt": ["A parasitic infection transmitted by the feces of the \"kissing bug\" (triatomine), which lives in the cracks of mud walls and thatched roofs of substandard rural housing.", "It remains silent for years before causing fatal heart failure."], "doIHaveIt": ["Do you live in a rural home with mud walls or a thatched roof in Latin America, and did you suffer a bite that caused severe swelling of one eyelid weeks ago?", "Years after living in such housing, have you developed chronic shortness of breath, a pounding or irregular heartbeat, or frequent dizziness?", "Do you experience severe difficulty swallowing food or chronic, severe constipation that lasts for many days at a time?"], "whatShouldIDo": ["Improve home conditions: Plaster over cracks in mud walls, use bed nets, and move livestock/animals away from the immediate sleeping quarters to eliminate bug hiding places.", "If you suspect an active bite, wash the area immediately with soap and clean water to flush away parasite-laden bug feces before it enters the skin."], "whenToSeeDoctor": ["Seek a blood test at a health center if you develop chronic heart palpitations or shortness of breath and have a history of living in basic, rural, insect-prone housing."]}, {"name": "Childhood Pneumonia", "categories": ["Whole Body/Systemic", "Respiratory/Chest"], "symptoms": ["High, sudden fever", "Cough or rapid breathing", "Acute shortness of breath", "Cough w/ phlegm or blood"], "urgency": "Emergency (Very Urgent)", "whatIsIt": ["A severe infection of one or both lungs in young children, caused by bacteria or viruses.", "It fills the lungs with fluid, making it the leading infectious cause of death in children under five globally."], "doIHaveIt": ["Does the child have a cough and a fever, combined with abnormally fast breathing? \n(Home test: Count breaths for 1 minute while the child is calm. More than 50 breaths/min for an infant, or more than 40 breaths/min for a toddler is a major warning sign).", "When the child breathes in, do the muscles under their ribs pull inward sharply, creating a hollow dip in their stomach?", "Does the child make a rhythmic \"grunting\" sound with every exhale, or are they too weak to breastfeed or drink fluids?"], "whatShouldIDo": ["Never give heavy adult cough syrups or sedatives, as these can depress a child's breathing muscles and prove fatal.", "Keep the child sitting up or held upright to make breathing easier.", "Continue offering frequent, small sips of breastmilk or oral rehydration fluids to prevent dehydration from the high fever."], "whenToSeeDoctor": ["Seek care immediately. If a child displays fast breathing, chest indrawing, or a blue/gray tint around their lips, they require urgent antibiotics and oxygen to survive."]}, {"name": "Cholera", "categories": ["Stomach/Intestines"], "symptoms": ["Sudden, watery \"rice-water\" stool", "Rapid dehydration"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["An acute, highly contagious bacterial infection of the intestine caused by drinking water contaminated with sewage.", "It causes catastrophic, rapid dehydration that can kill an otherwise healthy adult in hours."], "doIHaveIt": ["Have you suddenly developed massive, painless, watery diarrhea that looks like cloudy white \"rice water\"?", "Are you vomiting frequently without high fever, and losing fluids at an alarmingly fast rate?", "Are you showing signs of severe dehydration: extreme thirst, a completely dry mouth, sunken eyes, or skin that stays wrinkled up when you pinch it?"], "whatShouldIDo": ["Begin dynamic fluid replacement instantly. Do not wait to travel to a clinic. Dehydration can kill before you arrive.", "Mix an Oral Rehydration Salts (ORS) packet into clean water. If unavailable, create a home mix: 1 liter of clean water, 6 level teaspoons of sugar, and 1/2 level teaspoon of salt. Drink this continuously after every loose stool.", "Isolate the patient's waste and wash hands thoroughly with chlorinated water or soap to prevent the infection from sweeping through the household."], "whenToSeeDoctor": ["Seek emergency clinical care immediately while continuously drinking your home hydration mix. If the patient becomes too weak to drink, passes out, or stops urinating entirely, they require immediate intravenous (IV) fluids."]}, {"name": "Chronic Heart Failure", "categories": ["Respiratory/Chest", "Cardiovascular"], "symptoms": ["Chronic shortness of breath", "Chronic irregular heartbeats"], "urgency": "Emergency (Very Urgent)", "whatIsIt": ["A chronic condition where the heart muscle weakens and can no longer pump blood efficiently.", "This causes fluid to back up into the lungs and lower limbs, universally affecting aging populations."], "doIHaveIt": ["Do you experience shortness of breath during mild exertion, or find that you wake up gasping for air at night unless you prop yourself up with multiple pillows?", "Have both of your legs, ankles, or feet become visibly swollen and heavy, and does pressing your finger into the swelling leave a persistent dimple in the skin?", "Are you suffering from constant fatigue alongside a persistent, hacking cough that worsens when you lie completely flat on your back?"], "whatShouldIDo": ["Strictly reduce your daily salt intake. Excess salt forces your body to retain fluid, directly overloading your failing heart.", "Elevate your legs on pillows or cushions whenever you are sitting or resting to help drain pooled fluid back into your circulation.", "Track your weight; a sudden, unexplained weight gain of 1–2 kg in a single day means your body is dangerously retaining fluid."], "whenToSeeDoctor": ["Seek prompt evaluation if your breathing worsens significantly while resting, or if you experience sudden dizziness or a fluttering chest pulse. If accompanied by crushing chest pain, treat it as an immediate heart attack emergency."]}, {"name": "Chronic Kidney Disease (Standard)", "categories": ["Whole Body/Systemic", "Fluid/Metabolism Changes"], "symptoms": ["Fatigue", "Pale skin/dizziness", "Drastic decrease in urine output", "Swelling legs", "Puffy eyes"], "urgency": "Semi-Urgent", "whatIsIt": ["The gradual, irreversible loss of kidney function over months or years, universally caused by long-term, unmanaged high blood pressure or diabetes.", "It allows toxic waste products to build up in the bloodstream."], "doIHaveIt": ["Have you had unmanaged diabetes or high blood pressure for years, and have you recently noticed your urine becoming consistently foamy or bubbly?", "Are you experiencing progressive, unexplained swelling around your eyelids in the morning, or in your ankles and feet by evening?", "Have you developed a metallic taste in your mouth, a total loss of appetite, persistent nausea, and severe, widespread itchy skin?"], "whatShouldIDo": ["Protect your remaining kidney function: Strictly avoid taking over-the-counter NSAID pain medications (like Ibuprofen, Diclofenac, or Naproxen), as these are highly toxic to weakened kidneys.", "If you have diabetes or hypertension, take your medications daily to keep your blood sugar and blood pressure as low and stable as possible.", "Limit your intake of heavily processed foods and excess protein, which force the kidneys to work harder to filter waste."], "whenToSeeDoctor": ["Seek clinical care if your urine output drops drastically, if your breathing becomes short and labored due to fluid buildup, or if you experience muscle twitching and confusion from waste buildup."]}, {"name": "Chronic Kidney Disease Of Unknown Origin (Ckdu)", "categories": ["Whole Body/Systemic", "Fluid/Metabolism Changes"], "symptoms": ["Fatigue", "Pale skin/dizziness", "Drastic decrease in urine output", "Swelling legs", "Puffy eyes"], "urgency": "Semi-Urgent", "whatIsIt": ["A devastating form of kidney failure that selectively targets young, impoverished agricultural workers in hot climates (e.g., Central America, South Asia).", "It is unrelated to diabetes or high blood pressure and is driven by heavy manual labor, severe dehydration, and pesticide exposure."], "doIHaveIt": ["Are you a manual laborer or farmer working long hours in extreme heat, and have you suffered from chronic, recurring episodes of severe dehydration or heat exhaustion?", "Do you frequently experience painful urination, lower back pain, or deep muscle cramps without any history of high blood sugar?", "Have you noticed a gradual onset of unexplained weakness, joint pain, or swelling in your lower limbs despite being young and otherwise fit?"], "whatShouldIDo": ["Mandatory Hydration: You must drink clean water continuously throughout your work shift. Do not wait until you are thirsty. Drink 1 liter of water for every hour of heavy labor in the sun.", "Shade Breaks: Enforce strict rest breaks in shaded areas during peak sun hours to prevent heat stress from damaging your kidney tubules.", "Avoid Toxic Painkillers: Never take daily Ibuprofen or Diclofenac for your work aches; these compound kidney damage under dehydrated conditions."], "whenToSeeDoctor": ["Seek laboratory screening (blood creatinine and urine protein) if you are an agricultural worker experiencing persistent lower back fatigue, muscle cramps, or reduced urination."]}, {"name": "Colorectal Cancer", "categories": ["Whole Body/Systemic", "Stomach/Intestines"], "symptoms": ["Fatigue", "Unexplained weight loss", "Lower abdominal pain", "Blood in stool"], "urgency": "Urgent", "whatIsIt": ["A malignant tumor that develops slowly within the tissues of the large intestine or rectum.", "It heavily impacts older populations and is frequently missed in areas lacking routine screening."], "doIHaveIt": ["Have you noticed a persistent, unexplained change in your bowel habits lasting more than a month, such as new, continuous diarrhea or severe constipation?", "Have you seen dark red blood mixed directly into your stool, or are your stools suddenly looking consistently thin and pencil-like?", "Are you suffering from unexplained, progressive weight loss combined with constant lower stomach cramps and a feeling that your bowel never fully empties?"], "whatShouldIDo": ["Do not assume all rectal bleeding is caused by simple hemorrhoids (piles), especially if you are over 45 years old or experiencing weight loss.", "Increase your dietary fiber by eating whole grains, vegetables, and beans, and minimize your intake of charred or heavily processed meats.", "Keep a written log of your bowel movements and any visualization of blood to present to a health worker."], "whenToSeeDoctor": ["Schedule a clinic visit if you notice blood in your stool, experience persistent changes in your bowel patterns, or drop weight rapidly without trying."]}, {"name": "Conjunctivitis (Pink Eye)", "categories": ["Vision/Eyes"], "symptoms": ["Chronic redness", "Watery/yellow discharge"], "urgency": "Non-Urgent", "whatIsIt": ["A highly contagious inflammation or infection of the clear membrane covering the white part of your eye.", "It spreads rapidly through families and schools but rarely threatens vision."], "doIHaveIt": ["Is the white part of one or both of your eyes visibly pink or bright red, accompanied by a gritty, itchy, or burning sensation?", "Do your eyes produce a clear, watery fluid, or a thick yellow-green discharge that crusts over your eyelashes while you sleep?", "Are your eyelids slightly swollen, though your actual vision remains clear when you wipe the fluid away?"], "whatShouldIDo": ["Strict Isolation and Hygiene: Do not share towels, bedding, or clothing with family members. Wash your hands with soap immediately after touching your face.", "Apply a clean cloth soaked in cool, clean water over your closed eyelids to soothe irritation and gently soften crusty discharge.", "Do not use traditional herbal washes, urine, or caustic drops in the eye, as these can cause permanent corneal scarring."], "whenToSeeDoctor": ["This condition usually resolves on its own within a week. However, you should seek care if you develop severe eye pain, extreme sensitivity to light, or if your vision remains blurry even after clearing away eye discharge."]}, {"name": "COPD (Chronic Obstructive Pulmonary Disease)", "categories": ["Respiratory/Chest"], "symptoms": ["Chronic shortness of breath", "Cough w/ phlegm or blood"], "urgency": "Urgent", "whatIsIt": ["A progressive, incurable lung disease caused by long-term damage to the airways.", "It is highly prevalent among older individuals with a history of heavy tobacco smoking or decades of exposure to indoor biomass cooking smoke."], "doIHaveIt": ["Do you suffer from a chronic, daily cough that produces thick, stubborn phlegm, often referred to as a \"smoker's cough\"?", "Do you experience a constant, daily shortness of breath that worsens with basic movements like walking up a gentle slope or carrying a light load?", "Does your chest frequently make a low, rattling or wheezing sound when you breathe out, particularly in the early morning hours?"], "whatShouldIDo": ["Stop smoking immediately and eliminate all exposure to secondhand tobacco smoke or indoor cooking fires. This is the single most important step to halt disease progression.", "Stay physically active within your personal limits; gentle, regular walking helps maintain breathing muscle strength.", "Stay well hydrated to help thin out the thick mucus in your lungs, making it easier to cough up."], "whenToSeeDoctor": ["Visit a clinic if your daily breathing worsens significantly, if you develop a fever along with darker, foul-smelling phlegm, or if you require extra pillows to sleep comfortably at night."]}, {"name": "COVID-19 / Severe Respiratory Infection", "categories": ["Whole Body/Systemic", "Respiratory/Chest"], "symptoms": ["High, sudden fever", "Cough or rapid breathing", "Cough w/ phlegm or blood"], "urgency": "Urgent", "whatIsIt": ["A highly contagious respiratory infection caused by a airborne virus.", "While often mild, it can rapidly progress to severe viral pneumonia, causing dangerous oxygen drops across all age groups."], "doIHaveIt": ["Have you suddenly developed a high fever, a dry, hacking cough, and a complete, sudden loss of your sense of taste or smell?", "Are you experiencing severe body aches, a sore throat, profound fatigue, and a persistent headache that came on rapidly?", "Do you feel an unusual tightness or mild shortness of breath in your chest when walking around your home?"], "whatShouldIDo": ["Isolate immediately: Stay in a separate room away from family members and wear a mask over your nose and mouth to halt airborne transmission.", "Manage fevers and body aches with standard Paracetamol (Acetaminophen) and drink large amounts of fluids to prevent dehydration.", "Rest in a prone position (lying flat on your stomach) for several hours a day, which can help optimize lung aeration and improve oxygen levels."], "whenToSeeDoctor": ["Seek medical care immediately if you develop severe shortness of breath, a constant crushing pressure in your chest, confusion, or if your lips and fingers take on a blue or gray coloration."]}, {"name": "Dengue Fever", "categories": ["Whole Body/Systemic"], "symptoms": ["High, sudden fever", "Severe headache/body aches", "Fatigue", "Joint pain/rashes"], "urgency": "Urgent", "whatIsIt": ["A common viral infection transmitted by the bite of an infected Aedes mosquito in tropical urban and rural communities.", "It causes severe, acute incapacitation but does not typically cause spontaneous internal bleeding on its own."], "doIHaveIt": ["Did you experience a sudden, explosive onset of a crashing high fever, accompanied by a severe, throbbing ache directly behind your eyeballs?", "Are your muscles, lower back, and joints aching so intensely that it feels like your bones are physically cracking or breaking?", "Have you developed a flat, red skin rash across your chest, back, or arms a few days after the high fever started, along with severe fatigue and nausea?"], "whatShouldIDo": ["Critical Warning: NEVER take Aspirin, Ibuprofen, Diclofenac, or Naproxen. These common painkillers thin the blood and can accidentally cause standard Dengue to transform into a lethal bleeding condition. Only use Paracetamol (Acetaminophen) to manage fever and pain.", "Drink extensive amounts of fluids (clean water, ORS, coconut water, or clear broths) to restabilize your system.", "Rest under a mosquito net during daylight hours to prevent local mosquitoes from biting you and spreading the virus to your neighbors."], "whenToSeeDoctor": ["Visit a health worker if your high fever and severe bone pain fail to improve after 3 to 4 days, or if you are completely unable to keep fluids down due to continuous vomiting."]}, {"name": "Dengue Hemorrhagic Fever", "categories": ["Maternal/Bleeding"], "symptoms": ["Bleeding from gums, nose, or wounds after a bite", "Heavy bleeding"], "urgency": "Emergency (Very Urgent)", "whatIsIt": ["A severe, life-threatening complication of the Dengue virus. It typically strikes a person who is being infected with Dengue for a second time in their life.", "It causes blood vessels to become porous and leak fluid out of the circulation, resulting in severe internal bleeding and fatal blood pressure shock."], "doIHaveIt": ["The Critical Window: As your high dengue fever suddenly begins to drop back down to normal, do you suddenly feel drastically worse, weaker, or deeply restless instead of better?", "Are you experiencing severe, continuous abdominal pain combined with non-stop vomiting?", "Have you noticed spontaneous bleeding from your gums, frequent nosebleeds, or are you vomiting dark blood or passing solid black stools?", "Can you see tiny, pinpoint red or purple spots (petechiae) appearing across your skin, or large unexplained bruises forming?"], "whatShouldIDo": ["Treat this as an immediate medical crisis. Do not attempt to manage these symptoms at home with herbs or pain relievers.", "Aggressively focus on drinking oral rehydration solutions (ORS) while you are actively being transported to a clinic or hospital.", "Keep the patient resting flat on their back, keeping them warm and completely calm to support their fragile blood pressure."], "whenToSeeDoctor": ["Immediately. The transition from standard Dengue to Dengue Hemorrhagic Fever happens in a matter of hours as the initial fever fades. If severe stomach pain, persistent vomiting, or any signs of bleeding appear, rush to an emergency medical center to receive life-saving intravenous (IV) fluid management."]}, {"name": "Dental Abscesses", "categories": ["Skin"], "symptoms": ["Painful lump in mouth/jawline"], "urgency": "Semi-Urgent", "whatIsIt": ["A localized collection of pus caused by a bacterial infection in the center of a tooth, typically stemming from untreated tooth decay.", "If neglected, the infection can breach the jawbone and track down into the neck or brain."], "doIHaveIt": ["Do you have a severe, continuous, throbbing toothache that radiates outward to your jawbone, neck, or ear?", "Is there a visible, painful, swollen lump on your gums that looks like a pimple near the root of the aching tooth?", "Does biting down or consuming hot or cold liquids cause an agonizing, shocking pain, and is your face visibly swollen on that side?"], "whatShouldIDo": ["Rinse your mouth with warm salt water (1/2 teaspoon of salt in a glass of warm water) several times a day to draw out fluid and cleanse the area.", "Do not attempt to puncture or pop the gum swelling with a needle or pin, as this can drive the bacterial infection deeper into your facial tissues.", "Manage the pain using over-the-counter pain relievers and avoid chewing food on the affected side of your mouth."], "whenToSeeDoctor": ["Visit a dental provider or health clinic promptly to have the infection drained. If the swelling expands to your neck, causes a high fever, or makes it difficult to swallow or breathe, seek emergency medical care immediately."]}, {"name": "Dysentery (Amebic Or Bacterial)", "categories": ["Stomach/Intestines"], "symptoms": ["Acute diarrhea w/ blood, mucus, stomach cramps", "Rapid dehydration"], "urgency": "Urgent", "whatIsIt": ["An intestinal inflammation caused by consuming food or water contaminated with specific bacteria or parasites.", "It is distinguished from standard diarrhea by severe intestinal ulceration and visible blood loss."], "doIHaveIt": ["Are you suffering from frequent, loose stools that contain visible streaks of blood and thick mucus?", "Do you experience severe, agonizing abdominal cramps right before passing stool, accompanied by a painful, constant feeling that you need to go even when your bowels are empty?", "Is your diarrhea accompanied by a high fever, chills, and sudden weakness?"], "whatShouldIDo": ["Aggressive Rehydration: Drink oral rehydration solutions (ORS) continuously to replace lost water and essential electrolytes.", "Do not take over-the-counter anti-diarrheal medicines (like Loperamide), as these trap the dangerous toxins and bacteria inside your intestines, making the infection worse.", "Maintain nutrition by eating small, easily digestible meals such as rice water, porridges, or boiled bananas."], "whenToSeeDoctor": ["Seek clinical care for targeted antimicrobial or antiparasitic treatment if there is blood in your stool, your fever remains high, or you show signs of severe dehydration (sunken eyes, extreme lethargy)."]}, {"name": "Epilepsy / Seizure Disorder", "categories": ["Muscular/Neurological"], "symptoms": ["Seizures/convulsions"], "urgency": "Urgent", "whatIsIt": ["A chronic neurological condition characterized by recurrent, unprovoked disturbances in the brain's electrical activity.", "It is universally prevalent and often highly manageable with daily low-cost medications."], "doIHaveIt": ["Have you experienced multiple episodes where you suddenly lost consciousness, fell to the ground, and had uncontrollable jerking movements of your arms and legs?", "During these episodes, do you lose control of your bladder, bite your tongue, or wake up feeling deeply confused, sore, and disoriented?", "Do you experience sudden, brief \"blanking out\" episodes where you stare blankly into space for a few seconds and cannot hear people talking to you?"], "whatShouldIDo": ["First Aid for a Seizure: If someone is having a seizure, gently guide them to the ground away from sharp objects. Turn them onto their side to keep their airway clear.", "Strict Warning: NEVER insert anything into a seizing person's mouth (no spoons, sticks, or cloth). They cannot swallow their tongue, and inserting objects can break teeth or block their breathing.", "Do not restrain or hold down their limbs during jerking movements."], "whenToSeeDoctor": ["Seek immediate emergency medical care if a single seizure lasts longer than 5 minutes, if a person has a second seizure right after the first without waking up, or if the person is pregnant or injured."]}, {"name": "Farmer's Lung", "categories": ["Respiratory/Chest", "Cardiovascular"], "symptoms": ["Chronic shortness of breath", "Dry, hacking cough", "Chest tightness from dust/mold/cold air"], "urgency": "Semi-Urgent", "whatIsIt": ["An intense allergic reaction and lung inflammation (hypersensitivity pneumonitis) triggered by breathing in dust and mold from damp, decomposing hay, grain, or agricultural straw.", "It is a critical occupational hazard for isolated rural farmers."], "doIHaveIt": ["Are you an agricultural worker who develops a dry cough, chills, a fever, and shortness of breath 4 to 8 hours after handling damp, moldy feed or crops?", "Do these flu-like symptoms improve within a few days when you stay completely away from the barn or fields, but return worse the next time you handle crops?", "Over months of exposure, have you developed a permanent, daily shortness of breath and unintended weight loss?"], "whatShouldIDo": ["Source Control: Avoid handling moldy agricultural materials whenever possible. Always store hay, grains, and crops in well-ventilated, dry areas to halt mold growth.", "Personal Protection: If you must handle damp feed, always wear a tightly fitted, high-efficiency particle mask or respirator over your nose and mouth.", "Wet down dry, dusty feed or bedding before moving it to prevent mold spores from launching into the air you breathe."], "whenToSeeDoctor": ["Visit a healthcare worker if your shortness of breath persists even on days when you do not handle crops, or if you develop clubbing (widening and flattening) of your fingernails, which indicates chronic lung scarring."]}, {"name": "Gastroesophageal Reflux Disease (GERD)", "categories": ["Stomach/Intestines"], "symptoms": ["Upper abdominal pain"], "urgency": "Non-Urgent", "whatIsIt": ["A common, universal digestive condition where stomach acid frequently \nflows back up into the tube connecting your mouth and stomach.", "This backwash irritates the sensitive lining of your esophagus."], "doIHaveIt": ["Do you experience a frequent burning sensation in your chest (heartburn), usually \nafter eating, which feels worse when you lie down flat or bend over?", "Does a bitter, sour-tasting stomach acid occasionally rush up into the back of your \nthroat or mouth?", "Do you wake up with a chronic dry cough, a raspy hoarse voice, or a feeling like \nthere is a permanent lump stuck in your throat?"], "whatShouldIDo": ["Gravitational Elevation: Elevate the head of your bed by 6 inches using \nwooden blocks or bricks under the bedposts. Propping up just your head \nwith extra pillows bends your waist and can worsen acid reflux.", "Avoid eating large meals within 3 hours of going to sleep, and limit your intake of \nheavy fats, spicy foods, caffeine, and alcohol.", "Eat smaller, more frequent meals throughout the day and avoid wearing tight \nbelts or tight clothing that squeezes your abdomen."], "whenToSeeDoctor": ["This condition is safely managed at home. However, you should see a doctor if you \ndevelop difficulty or severe pain when swallowing food, vomit blood, or if your chest pain\nis accompanied by shortness of breath and radiates to your left arm (signs of a heart \nattack)."]}, {"name": "Glaucoma (Chronic)", "categories": ["Vision/Eyes"], "symptoms": ["Tunnel vision"], "urgency": "Semi-Urgent", "whatIsIt": ["A progressive eye disease characterized by gradual, imperceptible damage to the optic nerve, typically driven by elevated pressure inside the eye.", "It causes permanent vision loss but gives no pain warnings early on."], "doIHaveIt": ["Have you noticed a slow, irreversible loss of your peripheral (side) vision, making you feel like you are looking through a narrow tunnel?", "Do you find yourself frequently bumping into furniture or objects on your sides that you simply did not see?", "Are you over the age of 40, or do you have a family history of blindness, and notice your overall vision slowly dimming over years without any physical eye pain?"], "whatShouldIDo": ["Be aware that daily eye strain or reading in low light does not cause glaucoma, and vision lost to chronic glaucoma cannot be recovered.", "The primary defense is early screening at an eye center to check pressure before symptoms appear.", "If you are prescribed pressure-lowering eye drops, you must use them every single day without fail to halt further vision loss."], "whenToSeeDoctor": ["Visit an eye care specialist as soon as you notice a persistent reduction in your side vision. If you suddenly develop intense eye pain, a severe headache, and blurry vision, treat it as an emergency (Acute Angle-Closure Glaucoma)."]}, {"name": "Hepatitis B", "categories": ["Stomach/Intestines", "Skin"], "symptoms": ["Upper abdominal pain", "Swollen belly or liver/bladder issues", "Yellowing of skin/eyes"], "urgency": "Semi-Urgent", "whatIsIt": ["A serious liver infection caused by the Hepatitis B virus, transmitted through infected bodily fluids or from mother to child at birth.", "It can become a lifelong, chronic condition that destroys the liver over decades."], "doIHaveIt": ["Have you noticed the whites of your eyes or your skin taking on a distinct yellow color (jaundice)?", "Is your urine looking abnormally dark (the color of tea or cola), while your stools look pale, clay-colored, or grey?", "Are you experiencing deep fatigue, nausea, a total loss of appetite, and a persistent, dull ache in the upper right side of your stomach beneath your ribs?"], "whatShouldIDo": ["Protect Your Liver: Absolutely avoid drinking any alcohol, and do not take high doses of Paracetamol (Acetaminophen), as your liver is compromised.", "Prevent Spreading: Do not share razors, toothbrushes, needles, or nail clippers, and use condoms during sexual activity to avoid transmitting the virus to household members.", "Ensure all infants in your household receive the Hepatitis B birth-dose vaccine within 24 hours of delivery."], "whenToSeeDoctor": ["Seek medical guidance if you develop jaundice or persistent upper right abdominal pain. If you become highly confused, severely lethargic, or start vomiting blood, seek emergency evaluation for acute liver failure."]}, {"name": "HIV/AIDS", "categories": ["Whole Body/Systemic"], "symptoms": ["Fatigue", "Unexplained weight loss"], "urgency": "Urgent", "whatIsIt": ["The Human Immunodeficiency Virus (HIV) is a virus transmitted through sexual contact, contaminated needles, or from mother to child.", "This profile covers the infection itself, which gradually multiplies to destroy vital immune cells, rather than the late-stage opportunistic sicknesses (check HIV/AIDS (Opportunistic Infections) for more)"], "doIHaveIt": ["Have you had unprotected sexual contact or shared needles, and did you develop a sudden flu-like illness (fever, sore throat, severe muscle aches, rash) a few weeks later?", "Have you noticed painless, firm, swollen lumps (lymph nodes) appearing simultaneously in your neck, armpits, and groin that stay swollen for months?", "Are you suffering from chronic, low-grade fevers and heavy, drenching night sweats that soak your bedding?"], "whatShouldIDo": ["Seek an anonymous, rapid HIV blood test. Knowing your status early is life-saving.", "Understand that an HIV diagnosis is no longer a death sentence; daily adherence to modern Antiretroviral Therapy (ART) pills fully suppresses the virus, protects your health, and prevents transmission to others.", "Always use condoms during sexual activity to protect your partners from transmission."], "whenToSeeDoctor": ["Visit a voluntary counseling, testing, and treatment center if you believe you have been exposed to the virus, or if you are experiencing long-term unexplained fevers, chronic weight loss, or persistent swollen lymph nodes."]}, {"name": "HIV/AIDS (Opportunistic Infections)", "categories": ["Whole Body/Systemic"], "symptoms": ["Chronic fever"], "urgency": "Urgent", "whatIsIt": ["A chronic viral infection that targets and weakens the body's immune system.", "Without daily Antiretroviral Therapy (ART), the immune system collapses, allowing common, minor germs to turn into life-threatening \"opportunistic\" infections."], "doIHaveIt": ["Have you suffered from a low-grade fever, severe night sweats, and a persistent, watery diarrhea that has lasted for more than two consecutive weeks?", "Have you experienced rapid, unexplained weight loss and a profound, wiping fatigue that makes daily tasks impossible?", "Do you have thick, painful, creamy white patches on your tongue or inside your mouth (thrush) that make it difficult to swallow food?"], "whatShouldIDo": ["Understand that an HIV diagnosis is highly manageable with modern medicine; daily access to ART pills allows individuals to live a normal, full life span.", "Maintain strict food and water hygiene. Drink only boiled or purified water and eat thoroughly cooked foods to protect your weakened immune system from dangerous gut parasites.", "Practice safe sex using condoms to protect your partners."], "whenToSeeDoctor": ["Visit a voluntary counseling and testing (VCT) center for a rapid finger-prick blood test if you have chronic fevers, thrush, or unexplained weight loss. Seek immediate care if you develop a severe cough and shortness of breath."]}, {"name": "Hookworm Infection", "categories": ["Whole Body/Systemic", "Stomach/Intestines"], "symptoms": ["Fatigue", "Pale skin/dizziness", "Lower abdominal pain", "Blood in stool"], "urgency": "Semi-Urgent", "whatIsIt": ["A parasitic worm infection of the small intestine.", "Hookworm larvae live in soil contaminated by human feces and burrow directly through the bare skin of feet, migrating to the gut where they feed on blood."], "doIHaveIt": ["Do you frequently walk barefoot on soil or work in agricultural fields where human waste is used as fertilizer or modern latrines are absent?", "Did you develop an intense, itchy, red rash or small blisters on the soles of your feet (\"ground itch\") after walking on damp soil?", "Are you suffering from chronic fatigue, dizziness, pale skin under your eyelids, and a dull, constant ache in your upper stomach?"], "whatShouldIDo": ["Prevention is Key: Never walk barefoot outdoors; always wear protective shoes or boots when working with soil or walking near latrine areas.", "Build and utilize deep latrines for all human waste disposal to break the life cycle of the parasite in your community.", "This condition is easily cured with low-cost, over-the-counter deworming pills (like Albendazole or Mebendazole), which are often distributed free in schools."], "whenToSeeDoctor": ["Visit a health post if you or your children display signs of severe anemia (profound fatigue, extreme paleness, or a racing heart during rest) alongside chronic stomach pain."]}, {"name": "Hydatid Disease", "categories": ["Respiratory/Chest", "Stomach/Intestines"], "symptoms": ["Cough w/ phlegm or blood", "Upper abdominal pain", "Swollen belly or liver/bladder issues"], "urgency": "Semi-Urgent", "whatIsIt": ["A parasitic tapeworm infection acquired by accidentally swallowing eggs found in the feces of infected dogs or livestock.", "The eggs hatch and grow into massive, fluid-filled cysts inside the liver or lungs over several years."], "doIHaveIt": ["Do you work closely with livestock or herding dogs in a rural pastoral community, and have you noticed a slow, progressive swelling in your upper stomach?", "Are you experiencing a constant, dull ache in the upper right side of your stomach, occasionally accompanied by nausea or a yellowing of your eyes?", "Have you developed a persistent cough, shortness of breath, or find yourself coughing up phlegm containing streaks of blood or fluid?"], "whatShouldIDo": ["Strict Hygiene Rules: Always wash your hands thoroughly with soap and clean water after handling dogs and before eating or preparing meals.", "Protect Livestock: Never feed raw slaughterhouse offal, lungs, or livers from livestock to dogs. This acts as the primary transmission vector that keeps the parasite alive.", "Wash all vegetables and fruits thoroughly, as they may be contaminated with microscopic tapeworm eggs from soil."], "whenToSeeDoctor": ["Visit a health facility for an ultrasound scan if you experience persistent upper stomach pain, unexplained lung symptoms, or feel a slow-growing, firm lump beneath your right rib cage."]}, {"name": "Hyperlipidemia", "categories": ["Cardiovascular"], "symptoms": ["Asymptomatic"], "urgency": "Non-Urgent", "whatIsIt": ["An excess of fatty substances (cholesterol and triglycerides) circulating in the blood.", "It causes zero physical pain or daily symptoms but silently narrows arteries, laying the groundwork for future strokes and heart attacks."], "doIHaveIt": ["Do you have a family history of early heart attacks, or do you have unmanaged type 2 diabetes or obesity, making you highly prone to high blood fat levels?", "Have you noticed soft, yellowish, raised bumps or patches forming on your eyelids or the skin around your eyes? (These are called xanthomas and are rare visual signs of severe cholesterol buildup).", "Are you a regular smoker with an inactive lifestyle and a diet rich in heavy animal fats?"], "whatShouldIDo": ["Modify your dietary lifestyle: Maximize your intake of high-fiber foods like vegetables, lentils, beans, and whole grains, while severely restricting animal fats, lard, and fried foods.", "Engage in at least 30 minutes of brisk, daily physical activity (like fast walking or farming) to help raise your body's healthy cholesterol levels.", "Stop smoking completely, as tobacco chemicals interact with blood fats to accelerate dangerous artery blockages."], "whenToSeeDoctor": ["Since this condition is entirely invisible, plan a basic blood test screening (lipid panel) during a routine visit to a health center if you are over 35 or have other metabolic risk factors."]}, {"name": "Hypertension", "categories": ["Cardiovascular"], "symptoms": ["Asymptomatic"], "urgency": "Semi-Urgent", "whatIsIt": ["A chronic medical condition where the force of blood pushing against your artery walls is consistently too high. It is known as the \"silent killer\" because it causes massive damage to the brain, heart, and kidneys over decades without any daily pain."], "doIHaveIt": ["Have you had your blood pressure measured at a clinic and found your numbers are consistently higher than 140/90?", "Do you suffer from frequent, severe headaches that strike at the very back of your head, particularly when waking up in the morning?", "Do you experience sudden episodes of blurry vision, a pounding sensation in your neck or chest, or unprovoked nosebleeds?"], "whatShouldIDo": ["Drastically Cut Salt: Remove the salt shaker from your table and avoid adding extra salt during cooking. Salt causes your body to hold water, directly increasing blood pressure.", "Avoid using traditional licorice herbs or over-the-counter decongestants, which can dangerously spike blood pressure.", "If a health worker prescribes daily blood pressure pills, you must take them every morning without fail, even on days when you feel completely fine."], "whenToSeeDoctor": ["Seek immediate emergency medical care if your blood pressure spikes severely and is accompanied by a crushing headache, chest pain, sudden breathlessness, or numbness on one side of your body (signs of an impending stroke or heart attack)."]}, {"name": "Influenza (The Flu)", "categories": ["Whole Body/Systemic"], "symptoms": ["High, sudden fever", "Severe headache/body aches"], "urgency": "Semi-Urgent", "whatIsIt": ["A common, highly contagious viral infection that attacks your respiratory system.", "While it shares symptoms with a cold, the flu strikes with a sudden, debilitating intensity across all age groups."], "doIHaveIt": ["Did you experience a sudden, rapid onset of a high fever and severe shaking chills that hit you over the span of just a few hours?", "Are your muscles, back, and joints aching so badly that you feel too weak to get out of bed?", "Are your systemic aches accompanied by a dry, hacking cough, a sore throat, a runny nose, and a severe headache?"], "whatShouldIDo": ["Rest and Rehydrate: Stay in bed and drink continuous fluids (broths, teas, water) to avoid severe dehydration caused by the high fever.", "Manage fevers and body aches with standard Paracetamol (Acetaminophen). Avoid giving Aspirin to children or teenagers due to the risk of severe liver complications.", "Isolate yourself from family members to prevent spreading the airborne virus through coughing or sneezing."], "whenToSeeDoctor": ["The flu typically passes within a week. However, you must seek medical care if you develop difficulty breathing, chest pain, a cough that worsens and brings up foul phlegm, or if an elderly family member or infant becomes unresponsive."]}, {"name": "Leishmaniasis (Cutaneous)", "categories": ["Skin"], "symptoms": ["Sore refusing to heal"], "urgency": "Semi-Urgent", "whatIsIt": ["A parasitic skin infection transmitted by the bite of an infected tiny sandfly.", "It causes highly disfiguring, long-lasting open sores on parts of the body exposed to fly bites (face, arms, legs)."], "doIHaveIt": ["Do you live in an area prone to sandflies, and did a small, red bump form on your skin weeks or months after an insect bite?", "Has that skin bump slowly grown larger and broken open into a prominent, crater-like ulcer with a raised, firm border?", "Is the ulcer remarkably painless and free of pus, yet it stubbornly refuses to heal despite weeks of using standard skin creams or ointments?"], "whatShouldIDo": ["Do not apply traditional caustic chemicals, battery acid, or hot stones to burn the ulcer. This causes extensive permanent tissue destruction and deep scarring without killing the deep parasite.", "Keep the open sore fully covered with clean, dry bandages to prevent dirt from entering and attracting flies, which can spread the infection.", "Protect yourself from sandflies by sleeping under fine-mesh bed nets treated with insecticide and covering exposed skin during dusk and nighttime hours."], "whenToSeeDoctor": ["Visit a health worker if you have any chronic, non-healing skin sore that has lasted for more than 3 to 4 weeks for specialized antiparasitic evaluation."]}, {"name": "Leishmaniasis (Visceral)", "categories": ["Whole Body/Systemic"], "symptoms": ["Chronic fever", "Fatigue", "Pale skin/dizziness"], "urgency": "Urgent", "whatIsIt": ["The severe, systemic internal form of leishmaniasis where the parasite migrates from the skin bite into the internal organs.", "It systematically destroys the liver, spleen, and bone marrow, and is nearly 95% fatal without clinical medical treatment."], "doIHaveIt": ["Have you been suffering from a low-grade, irregular fever that has persisted for several weeks or months without stopping?", "Has your upper stomach area become visibly swollen and protruding, feeling firm and heavy to the touch? (Due to massive swelling of the internal spleen and liver).", "Are you experiencing progressive, severe weight loss, a total loss of appetite, and a noticeable grayish darkening of the skin on your face or hands?", "Are the linings of your eyes, gums, and palms looking intensely pale due to severe, chronic bone marrow suppression?"], "whatShouldIDo": ["Recognize that no home remedy, diet change, or traditional herbal wash can cure this internal parasite. It requires highly specialized clinical drug therapies.", "Rest comfortably, isolate the patient from heavy physical labor, and provide nutrient-rich, soft foods to help support their heavily weakened body."], "whenToSeeDoctor": ["Visit a hospital or specialized health facility immediately if you experience long-term, unresolving fevers combined with an expanding, swollen upper abdomen or rapid weight loss to confirm the diagnosis, and immediately seek proper treatment."]}, {"name": "Leptospirosis", "categories": ["Whole Body/Systemic", "Skin", "Fluid/Metabolism Changes"], "symptoms": ["High, sudden fever", "Severe headache/body aches", "Fatigue", "Joint pain/rashes", "Yellowing of skin/eyes", "Drastic decrease in urine output", "Swelling legs", "Puffy eyes"], "urgency": "Urgent", "whatIsIt": ["A bacterial infection transmitted through water or damp soil contaminated with the urine of infected animals (most commonly rats).", "The bacteria enter the body through small skin cuts or the eyes/mouth during flooding or agricultural work."], "doIHaveIt": ["Have you recently waded through floodwaters, cleaned out drains, or worked in muddy fields where rats are common?", "Did you suddenly develop a high fever, severe chills, and excruciating, tender pain in your calf and lower back muscles?", "Are the whites of your eyes looking intensely red and bloodshot, though they are completely free of pus or crusty discharge?"], "whatShouldIDo": ["If you must work in muddy areas or floodwaters, always wear protective rubber boots and gloves, and cover any open skin cuts with waterproof bandages.", "Manage the initial high fever with Paracetamol and maintain fluid intake to protect your kidneys.", "Avoid entering slow-moving water sources or puddles near livestock pens or trash disposal areas."], "whenToSeeDoctor": ["Seek antibiotics promptly at a clinic. If you enter a severe secondary phase where your skin turns yellow (jaundice), your urine turns dark, or you start bleeding from your gums, treat it as an emergency. This indicates liver and kidney failure (Weil's disease)."]}, {"name": "Lupus", "categories": ["Whole Body/Systemic", "Respiratory/Chest", "Skin"], "symptoms": ["Chronic fever", "Fatigue", "Joint pain/rashes", "Dry, hacking cough", "Painless neck or armpit lumps", "Butterfly rash on cheeks"], "urgency": "Semi-Urgent", "whatIsIt": ["A chronic, autoimmune disease where the body's defense system becomes confused and mistakenly attacks its own healthy tissues and organs.", "It disproportionately impacts women of color and can damage joints, skin, and kidneys."], "doIHaveIt": ["Have you developed a prominent, red, butterfly-shaped rash that stretches across your cheeks and the bridge of your nose, which worsens after sun exposure?", "Do you suffer from persistent, unexplained joint pain and swelling in your fingers, hands, or wrists that shifts from joint to joint?", "Are you plagued by a low-grade fever, profound chronic fatigue, and do your fingers turn shockingly white or blue when exposed to cold air?"], "whatShouldIDo": ["Sun Protection is Essential: UV rays trigger severe internal flares. Always wear a wide-brimmed hat, long clothing, and stay in the shade during peak daylight hours.", "Incorporate regular rest periods into your daily routine to combat chronic fatigue, and use mild, unperfumed soaps on active skin rashes.", "Avoid taking home remedies that claim to \"boost the immune system,\" as stimulating an already overactive autoimmune response can trigger a dangerous disease flare."], "whenToSeeDoctor": ["Visit a medical clinic if you develop a persistent facial rash, chronic joint swelling, or if you notice your urine becoming dark or foamy (a sign that the disease is actively attacking your kidneys)."]}, {"name": "Malaria (Cerebral)", "categories": ["Muscular/Neurological"], "symptoms": ["Sudden confusion, slurred speech"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["The ultimate, life-threatening neurological complication of Falciparum malaria.", "It occurs when parasite-infected red blood cells physically clog the microscopic blood vessels inside the brain, causing severe brain swelling and coma."], "doIHaveIt": ["Does a family member or child who has been suffering from a fever suddenly display severe confusion, delirium, or extreme irritability?", "Is the feverish individual unable to recognize their own family members, slurring their words, or talking incoherently?", "Has the individual suddenly collapsed into violent, uncontrollable whole-body seizures or convulsions?", "Is the person completely unresponsive, unable to be woken up, or sliding into a deep coma?"], "whatShouldIDo": ["First Aid for Seizure/Coma: Gently lay the person on their side to keep their airway completely open. Ensure they cannot roll into fires, sharp objects, or water.", "Strict Warning: DO NOT try to force water, food, or oral malaria pills into an unconscious or seizing person's mouth. They will inhale it into their lungs, causing suffocation or fatal aspiration pneumonia.", "Keep the patient as cool as possible using room-temperature damp cloths on their forehead and body while transport is arranged."], "whenToSeeDoctor": ["Immediately. Cerebral malaria is an absolute, top-tier medical emergency with an incredibly high mortality rate without immediate intravenous (IV) or intramuscular antimalarial injections (like Artesunate). Rush to the nearest hospital instantly."]}, {"name": "Malaria (Falciparum)", "categories": ["Whole Body/Systemic", "Skin"], "symptoms": ["High, sudden fever", "Severe headache/body aches", "Yellowing of skin/eyes"], "urgency": "Emergency (Very Urgent)", "whatIsIt": ["The most dangerous and aggressive form of malaria, caused by the parasite Plasmodium falciparum.", "It multiplies rapidly in the bloodstream, destroying red blood cells and clogging small blood vessels, leading to organ failure if not treated within 24 hours."], "doIHaveIt": ["Do you live in or have you recently traveled to a known tropical malaria area, and did you develop a sudden, crushing fever with severe, shaking chills?", "Are your high fevers accompanied by severe body aches, a splitting headache, nausea, vomiting, and profound weakness?", "If you look at your urine, has it become abnormally dark brown or nearly black? (Known as \"Blackwater fever,\" a sign of massive red blood cell destruction).", "Are the inside linings of your lower eyelids looking shockingly pale or white (acute anemia)?"], "whatShouldIDo": ["Do not delay seeking a clinical blood test to try home remedies. Falciparum malaria can turn fatal rapidly.", "Manage high fevers using Paracetamol (Acetaminophen) and keep the individual cool with damp cloths. Drink oral rehydration fluids continuously to combat fluid loss from sweating and vomiting.", "Always sleep under insecticide-treated bed nets to prevent local mosquitoes from biting you and continuing the cycle of infection."], "whenToSeeDoctor": ["Seek care immediately. Any unprovoked high fever in a malaria-prone geographic area requires a rapid diagnostic test (RDT) within hours."]}, {"name": "Myocardial Infarction (Heart Attack)", "categories": ["Respiratory/Chest", "Cardiovascular"], "symptoms": ["Acute shortness of breath", "Sudden central chest pain"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["A life-threatening medical emergency where blood flow to a section of the heart muscle becomes completely blocked, causing heart cells to die from a lack of oxygen.", "Minutes matter to prevent total cardiac arrest."], "doIHaveIt": ["Are you experiencing a sudden, crushing, squeezing pain, pressure, or heavy tightness in the center of your chest that feels like an elephant sitting on you?", "Does this intense chest pain or discomfort radiate outward to your left arm, shoulder, neck, jaw, or upper back?", "Are you suddenly breaking out into a cold sweat, feeling deeply dizzy or lightheaded, and gasping for breath while resting?"], "whatShouldIDo": ["Sit down immediately and rest. Stop all physical movement, walking, or exertion, which strains the dying heart muscle.", "Chew an Aspirin: If you have standard adult Aspirin nearby, chew and swallow one full tablet (300mg) immediately. Chewing it speeds up its entry into your bloodstream to help dissolve the blood clot blocking the heart artery.", "Do not leave the person alone. Loosen tight clothing around their neck and chest."], "whenToSeeDoctor": ["Immediately. Call for emergency transport or travel to the nearest surgical or medical facility the second crushing chest pressure lasting more than 5 minutes occurs. Never try to \"wait out\" chest pain."]}, {"name": "Neonatal Tetanus / Tetanus", "categories": ["Muscular/Neurological"], "symptoms": ["Inability to open mouth, stiff neck"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["A lethal bacterial infection that produces a powerful toxin attacking the nervous system.", "It occurs when tetanus spores enter a wound, or infect a newborn's umbilical cord stump during unsterile home deliveries."], "doIHaveIt": ["For an Infant: Was the baby healthy at birth, but between day 3 and day 14 developed a sudden inability to suck or breastfeed because their jaw muscles clamped shut?", "For an Adult: Have you suffered a deep cut, puncture wound from a dirty tool, or animal bite, and have your jaw muscles become completely stiff and impossible to open? (Known as \"lockjaw\").", "Are you experiencing painful, violent muscle spasms where your entire back arches backward like a rigid bow when triggered by a sudden noise or light?"], "whatShouldIDo": ["Safe Birth Practices: Prevent newborn tetanus by ensuring maternal vaccination during pregnancy, never using unsterile blades to cut an umbilical cord, and keeping the cord stump clean and dry (avoid applying ash, mud, or dung).", "Clean all deep skin wounds immediately with abundant clean water and soap.", "Keep a tetanic individual in a completely dark, quiet room; noise and light trigger agonizing, dangerous whole-body muscle spasms."], "whenToSeeDoctor": ["Immediately. Tetanus is a rapid killer that causes breathing muscles to lock up. Seek emergency intensive clinical care for antitoxin and muscle relaxants as soon as jaw stiffness or muscle spasms begin."]}, {"name": "Nutritional Anemia", "categories": ["Whole Body/Systemic"], "symptoms": ["Fatigue", "Pale skin/dizziness"], "urgency": "Semi-Urgent", "whatIsIt": ["A highly prevalent condition where your blood lacks enough healthy red blood cells or hemoglobin, primarily driven by a dietary lack of iron, folate, or vitamin B12.", "It starves your muscles and tissues of oxygen."], "doIHaveIt": ["Do you suffer from constant, wiping fatigue and weakness, even after sleeping, alongside frequent dizziness when standing up quickly?", "If you look in a mirror and pull down your lower eyelid, does the inside lining look pale or white instead of a healthy, vibrant red color?", "Are your hands and feet constantly cold, and do you get abnormally short of breath or experience a racing heart during basic, light walking?"], "whatShouldIDo": ["Dietary Iron Enrichment: Increase your consumption of iron-rich foods, including dark green leafy vegetables, lentils, beans, eggs, and lean meats.", "Maximize Absorption: Eat iron-rich foods alongside citrus fruits (like lemons or oranges) because Vitamin C drastically helps your gut absorb iron.", "Avoid Tea with Meals: Do not drink tea or coffee with or immediately after your meals; chemicals in tea directly block iron absorption."], "whenToSeeDoctor": ["Visit a health post for evaluation if your fatigue prevents you from working, or if you develop pica (an abnormal craving to eat non-food items like dirt, clay, or ice, which is a classic sign of severe iron deficiency)."]}, {"name": "Organophosphate Poisoning", "categories": ["Respiratory/Chest", "Muscular/Neurological"], "symptoms": ["Sudden wheezing/tightness", "Muscle twitching, heavy sweating", "Pinpoint pupils", "Seizures/convulsions"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["Acute, lethal chemical poisoning caused by inhaling, swallowing, or absorbing agricultural pesticides through the skin.", "It causes a catastrophic chemical overload that overstimulates all fluid glands and muscles in the body."], "doIHaveIt": ["Pinpoint pupils"], "whatShouldIDo": ["Decontaminate Instantly: Strip off all contaminated clothing immediately. Wash the entire body aggressively with large amounts of soap and cold water to halt chemical absorption through the skin.", "If the chemical was swallowed, do not force the person to vomit unless instructed by a professional, as this can cause them to inhale the toxic chemical into their lungs.", "Ensure caregivers wear gloves and protective clothing to avoid getting the toxic pesticide on their own skin."], "whenToSeeDoctor": ["Immediately. Organophosphate poisoning can trigger fatal respiratory failure within hours. Rush the person to the nearest clinic or hospital; they require immediate life-saving injections of Atropine."]}, {"name": "Peptic Ulcer Disease", "categories": ["Stomach/Intestines"], "symptoms": ["Upper abdominal pain"], "urgency": "Semi-Urgent", "whatIsIt": ["Painful sores or ulcers that develop on the interior lining of your stomach or the upper section of your small intestine, frequently caused by chronic H. pylori bacterial infections or excessive use of chemical painkillers."], "doIHaveIt": ["Do you suffer from a burning, gnawing stomach pain located in your upper abdomen between your navel and breastbone?", "Does this burning pain follow a strict pattern: worsening when your stomach is completely empty (such as in the middle of the night) and temporarily improving when you eat food or take an antacid?", "Are you plagued by frequent bloating, acid burping, and a feeling of nausea after completing normal meals?"], "whatShouldIDo": ["Stop Toxic Painkillers: Immediately cease taking NSAID pain medications (like Ibuprofen, Diclofenac, Naproxen, or Aspirin). These drugs actively block your stomach's ability to protect itself from its own acid, worsening ulcers.", "Avoid consuming alcohol, smoking tobacco, and eating highly acidic or heavily spiced foods, which directly irritate the raw ulcerated lining.", "Eat smaller, regular meals to keep a gentle coating of food in the stomach, preventing raw acid from burning the sores."], "whenToSeeDoctor": ["Visit a clinic to receive targeted acid-blocking medication and antibiotics. Seek immediate emergency care if you vomit dark brown fluid that looks like coffee grounds, pass solid black, tarry stools, or feel a sudden, agonizing tear in your upper abdomen."]}, {"name": "Peripheral Artery Disease", "categories": ["Cardiovascular"], "symptoms": ["Leg pain while walking (stops at rest)"], "urgency": "Semi-Urgent", "whatIsIt": ["A chronic circulatory condition where plaque builds up and narrows the arteries supplying blood to your limbs, typically affecting the legs.", "It starves leg muscles of oxygenated blood during movement."], "doIHaveIt": ["Do you experience a predictable, painful cramping or aching in your calves, thighs, or buttocks while walking or climbing stairs?", "Does this leg pain completely vanish within a few minutes of standing still and resting, only to return once you resume walking? (This pattern is called claudication).", "Has the skin on your lower legs become shiny and hairless, and are the pulses in your feet very faint or impossible to feel with your fingers?"], "whatShouldIDo": ["Do not sit still permanently: While walking causes temporary aching, regular, structured walking exercises (walking until the pain starts, resting, and walking again) actually forces your body to build new helper blood vessels over time.", "Stop Smoking Immediately: Smoking is the primary driver of artery narrowing and can lead to complete limb blockages.", "Inspect your feet daily for small cuts, blisters, or skin color changes; poor circulation slows down healing and increases the risk of foot ulcers."], "whenToSeeDoctor": ["Visit a health center if your leg pain begins striking you while you are resting in bed, or if a small cut or blister on your foot turns dark, cold, or refuses to heal over several weeks."]}, {"name": "Postpartum Hemorrhage", "categories": ["Maternal/Bleeding"], "symptoms": ["Heavy bleeding"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["Heavy, excessive bleeding from the uterus immediately or shortly following childbirth.", "It is the leading cause of maternal death globally and can result in fatal shock within minutes if home containment steps are not performed."], "doIHaveIt": ["Have you recently given birth, and are you experiencing a sudden, massive gush or continuous, heavy pouring of blood from your vagina?", "Are you soaking through more than two thick sanitary pads or cloths every 15 minutes, or are you passing massive, hand-sized blood clots?", "Are you feeling rapidly dizzy, lightheaded, breaking out into a cold sweat, or feeling like you are about to pass out?"], "whatShouldIDo": ["Perform Fundal Massage Instantly: If the uterus is soft and boggy, the mother or a caregiver must place a firm hand on the lower belly (just below the navel) and rub and massage it vigorously in a circular motion. This causes the uterus to contract and clamp down on bleeding vessels.", "Breastfeed Immediately: Putting the newborn to the breast triggers the natural release of oxytocin, which forcefully contracts the uterus to slow bleeding.", "Lie flat on your back and elevate your legs on blankets to keep blood flowing to your brain while help is sourced."], "whenToSeeDoctor": ["Immediately. Postpartum hemorrhage is an absolute emergency. Arrange immediate transport to a surgical or medical center while continuously massaging the lower abdomen and keeping the baby at the breast."]}, {"name": "Preeclampsia / Eclampsia", "categories": ["Muscular/Neurological", "Maternal/Bleeding", "Fluid/Metabolism Changes"], "symptoms": ["Sudden weakness/numbness on one side of body", "Seizures/convulsions", "High blood pressure during pregnancy", "Drastic decrease in urine output", "Swelling legs", "Puffy eyes"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["A dangerous, pregnancy-specific condition marked by a sudden spike in blood pressure and kidney distress, typically striking after the 20th week of pregnancy.", "If left unmanaged, it can transition into Eclampsia, causing life-threatening seizures and strokes."], "doIHaveIt": ["Are you pregnant (past 5 months) or have you recently given birth, and have you developed a severe, throbbing headache that does not improve with rest or Paracetamol?", "Are you experiencing sudden vision changes, such as seeing flashing lights, dark spots, or sudden blurriness?", "Have your face, hands, and eyelids become visibly, drastically swollen over a single day, and are you suffering from intense pain in your upper right abdomen?"], "whatShouldIDo": ["Understand that preeclampsia cannot be managed with lifestyle changes or home remedies at home; it requires medical evaluation to determine if early delivery or blood pressure stabilization is required.", "If a pregnant woman displays these signs, she must stop all physical work and rest completely while transport to a maternity clinic is arranged.", "If an individual progresses to Eclampsia (seizures), turn them onto their side, clear their immediate surroundings, and do not place anything in their mouth."], "whenToSeeDoctor": ["Seek emergency obstetric care immediately if you display severe headaches, vision changes, facial swelling, or upper stomach pain during pregnancy. A seizure requires immediate, life-saving intervention."]}, {"name": "Sarcoidosis", "categories": ["Whole Body/Systemic", "Respiratory/Chest"], "symptoms": ["Chronic fever", "Chronic shortness of breath", "Dry, hacking cough"], "urgency": "Semi-Urgent", "whatIsIt": ["An inflammatory disease characterized by the formation of tiny clumps of inflammatory cells (granulomas) in various organs, most commonly the lungs and lymph nodes.", "Its exact cause is unknown and it can mimic tuberculosis."], "doIHaveIt": ["Have you developed a persistent, dry, hacking cough accompanied by a gradual shortness of breath that has lingered for months without any signs of improvement?", "Are you experiencing a low fever, unexplained weight loss, and tender, reddish-purple bumps or lumps on your shins or ankles?", "Have you noticed painless, firm swellings (lymph nodes) appearing in your neck, armpits, or around your collarbone?"], "whatShouldIDo": ["Maintain a healthy lifestyle by avoiding exposure to lung irritants such as heavy dust, chemical fumes, and tobacco smoke.", "Engage in gentle, regular physical activity to help maintain your lung capacity and reduce joint stiffness.", "Keep an accurate written record of your symptoms, as sarcoidosis can naturally alternate between long periods of worsening flares and spontaneous clearing."], "whenToSeeDoctor": ["Visit a medical clinic for a chest X-ray and evaluation if you have a persistent cough and shortness of breath that mimics tuberculosis but fails to resolve, or if you develop painful, red skin nodules on your lower legs."]}, {"name": "Schistosomiasis", "categories": ["Whole Body/Systemic", "Stomach/Intestines"], "symptoms": ["Fatigue", "Pale skin/dizziness", "Lower abdominal pain", "Upper abdominal pain", "Swollen belly or liver/bladder issues"], "urgency": "Semi-Urgent", "whatIsIt": ["A parasitic worm infection common in rural, tropical areas.", "Microscopic worm larvae are released by freshwater snails into slow-moving water and burrow directly through the bare skin of humans during wading, washing, or farming."], "doIHaveIt": ["Do you regularly wash clothes, farm, swim, or wade in local, untreated freshwater lakes, rivers, or streams?", "Did you develop an intense, itchy, bumpy skin rash (\"swimmer's itch\") within hours or days of entering the water?", "Weeks later, did you develop a sudden fever, chills, a dry cough, and deep muscle aches?", "For Chronic Form: Have you noticed visible blood in your urine (often turning it pink or red), or are you suffering from a progressively swollen, fluid-filled stomach with abdominal pain?"], "whatShouldIDo": ["Avoid Contaminated Water: Stop bathing, swimming, or washing clothes in untreated surface water. If you must cross a river, wear tall rubber boots.", "If you are accidentally exposed to river water, dry your skin aggressively with a clean towel immediately to help rub away burrowing larvae before they break the skin.", "Understand that this infection is highly curable with a short, low-cost course of an oral medication called Praziquantel, often distributed in rural endemic health campaigns."], "whenToSeeDoctor": ["Visit a health post if you notice blood in your urine, chronic lower stomach pain, or develop a long-term fever after history of contact with open freshwater sources."]}, {"name": "Sickle Cell Disease", "categories": ["Whole Body/Systemic"], "symptoms": ["Fatigue", "Pale skin/dizziness"], "urgency": "Urgent", "whatIsIt": ["An inherited red blood cell disorder genetically linked to specific ethnic backgrounds (e.g., African, Mediterranean, Middle Eastern ancestry).", "It causes red blood cells to stiffen into rigid \"sickle\" shapes that block small blood vessels, causing sudden, agonizing tissue damage."], "doIHaveIt": ["Do you have a family history of blood disorders, and do you or your children suffer from sudden, excruciating episodes of deep bone, joint, or stomach pain? (Known as a pain crisis).", "Have your young children experienced sudden, painful, and symmetric swelling of their hands and feet?", "Are you constantly dealing with severe fatigue, pale inner eyelids, and a yellow tint in the whites of your eyes (jaundice)?"], "whatShouldIDo": ["Aggressive Fluid Intake: During a pain crisis, you must drink massive amounts of clean water. Hydration thins the blood and helps unclog sickled cells from blocked vessels.", "Maintain Warmth: Avoid sudden exposure to extreme cold or jumping into cold water, as cold temperatures cause blood vessels to clamp shut, instantly triggering a severe pain crisis.", "Manage pain at home with warm compresses and standard pain relievers, while keeping the individual resting comfortably."], "whenToSeeDoctor": ["Seek clinical care promptly for a pain crisis. Go to a hospital immediately if a sickle cell patient develops a sudden high fever, severe chest pain with shortness of breath (Acute Chest Syndrome), or displays signs of a stroke."]}, {"name": "Snake Envenomation", "categories": ["Respiratory/Chest", "Skin", "Maternal/Bleeding"], "symptoms": ["Sudden wheezing/tightness", "Bite site complications", "Bleeding from gums, nose, or wounds after a bite", "Heavy bleeding"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["A critical, fast-acting medical emergency caused by the injection of toxins through the bite of a venomous snake.", "It can destroy tissue, cause internal bleeding, or paralyse breathing muscles within hours."], "doIHaveIt": ["Have you been bitten by a snake, and can you see one or two distinct puncture wounds (fang marks) on your skin?", "Is the area around the bite site swelling rapidly, turning dark purple, and causing an intense, burning pain?", "Are you experiencing systemic signs: sudden dizziness, bleeding from your gums or nose, or a heavy drooping of your eyelids accompanied by difficulty swallowing?"], "whatShouldIDo": ["Keep the Bitten Limb Completely Immobilized: Keep the limb resting at or slightly below the level of the heart. Minimize all movement; running or walking pumps the venom through your lymphatic system much faster.", "Clean the bite gently with water. Do not cut the wound, do not attempt to suck out the venom, and do not apply a tight tourniquet. Cutting and suction cause deep tissue infections, and tight tourniquets trap venom, destroying the entire limb.", "Remove any tight rings, bracelets, or clothing from the limb before swelling expands."], "whenToSeeDoctor": ["Immediately. Every venomous snakebite is a race against time. Arrange immediate transport to a hospital or health post that stocks antivenom. Do not delay travel to seek traditional healers."]}, {"name": "Stroke (Hemorrhagic)", "categories": ["Muscular/Neurological"], "symptoms": ["Sudden weakness/numbness on one side of body", "Sudden confusion, slurred speech", "Pinpoint pupils"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["A highly lethal type of stroke caused by a blood vessel suddenly bursting inside the brain, causing blood to leak into the skull and create dangerous intracranial pressure.", "It is universally driven by severe, untreated high blood pressure."], "doIHaveIt": ["Did you suddenly develop the most severe, agonizing headache of your life, striking like a sudden clap of thunder out of nowhere?", "Is your explosive headache accompanied by immediate nausea, forceful vomiting, and a very stiff, painful neck?", "Did you or the patient suddenly lose consciousness, fall into a deep faint, or experience a sudden seizure right after the headache started?", "Are you experiencing sudden weakness on one side of your body, severe dizziness, or an inability to stand up?"], "whatShouldIDo": ["Strict Warning: NEVER give Aspirin, Ibuprofen, or any blood-thinning medication. These drugs prevent clotting and will accelerate the active, fatal bleeding inside the brain.", "Keep the person completely still. Lay them on their side if they are vomiting to prevent them from breathing fluid into their lungs.", "Loosen any tight clothing around their neck to help manage pressure, and keep the environment as quiet and calm as possible."], "whenToSeeDoctor": ["Immediately. A hemorrhagic stroke carries an exceptionally high risk of death within the first few hours. Treat a sudden \"thunderclap\" headache with neurological weakness as a top-tier emergency and transport them to a hospital instantly."]}, {"name": "Stroke (Ischemic)", "categories": ["Muscular/Neurological"], "symptoms": ["Sudden weakness/numbness on one side of body", "Sudden confusion, slurred speech"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["The most common type of stroke, occurring when a blood clot blocks a narrowed artery supplying blood to the brain, starving brain cells of oxygen.", "It is heavily tied to unmanaged chronic hypertension and lack of preventative cardiovascular screenings."], "doIHaveIt": ["Did you experience a sudden, painless weakness or total numbness on just one side of your body (such as your left arm and left leg suddenly giving out)?", "When you try to smile in the mirror, does one side of your mouth droop down or refuse to move?", "Are you suddenly finding it difficult to speak, slurring your words, or unable to understand what someone right next to you is saying?", "Have you suddenly lost vision or developed blurry, double vision in one or both eyes out of nowhere?"], "whatShouldIDo": ["Do not give the person anything to eat or drink. A stroke can paralyze throat muscles, making swallowing highly dangerous and causing choking.", "Do not give Aspirin at home unless a scan has proven it is an ischemic stroke. If it turns out to be a bleeding stroke instead, Aspirin will make it far more lethal.", "Lay the person flat on their side (recovery position) to keep their airway completely clear. Note the exact time the first symptom started."], "whenToSeeDoctor": ["Immediately. An ischemic stroke is a time-critical emergency. Every minute wasted means millions of brain cells die. Rush to the nearest hospital right away."]}, {"name": "Trachoma", "categories": ["Vision/Eyes"], "symptoms": ["Sudden eye pain", "Chronic redness"], "urgency": "Semi-Urgent", "whatIsIt": ["A highly contagious bacterial eye infection spread by contact with eye discharge from infected people or via eye-seeking flies in overcrowded, water-scarce rural areas.", "Repeated infections lead to severe scarring of the inner eyelid."], "doIHaveIt": ["Do you live in an area with limited water access, and have you or your children suffered from recurring eye redness, itching, and mild discharge for months?", "When you look closely, does the inside of the upper eyelid feel rough, bumpy, and severely scarred?", "Have your eyelashes turned inward (trichiasis), causing them to scratch directly against your clear eyeball every time you blink?"], "whatShouldIDo": ["Enforce Face Washing: Aggressively wash your face and your children's faces with clean water and soap multiple times a day to wash away infective secretions and deter flies.", "Improve community sanitation by disposing of animal waste away from living quarters to drastically reduce eye-seeking fly populations.", "Understand that early infections are fully cured with a simple dose of low-cost antibiotics (like oral Azithromycin) available at local health clinics."], "whenToSeeDoctor": ["Visit a health facility if your eyelashes begin turning inward or scratching your eye. A simple, low-cost minor eyelid procedure can slide the lashes back outward, preventing permanent blindness from corneal scratching."]}, {"name": "Traumatic Hemorrhage", "categories": ["Maternal/Bleeding"], "symptoms": ["Heavy bleeding"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["Massive, uncontained external blood loss caused by a severe injury, deep cut, or physical trauma to major blood vessels.", "If blood loss is not halted immediately at home, death from hemorrhagic shock occurs in minutes."], "doIHaveIt": ["Have you sustained an injury, and is blood actively spurting or continuously pouring in large volumes from the wound?", "Is the blood pooling rapidly on the ground or fully soaking through your clothing and cloths within seconds?", "Is the injured individual turning pale, shivering, breathing rapidly, and starting to lose consciousness?"], "whatShouldIDo": ["Apply Direct, Constant Pressure Instantly: Place a clean cloth, towel, or your bare hands directly over the wound and press down as hard as you can without stopping. Do not lift the cloth to check if the bleeding has stopped; continuous pressure is what allows clots to form.", "Elevate: If the wound is on an arm or leg, keep it raised high above the level of the heart while maintaining constant manual pressure.", "If blood leaks through your initial cloth, do not remove it. Place a second cloth directly on top of it and press harder."], "whenToSeeDoctor": ["Immediately. Maintain heavy, direct manual pressure on the wound while transporting the injured person to the nearest clinic or surgical center. Never release pressure until a medical professional takes over."]}, {"name": "Triple-Negative Breast Cancer", "categories": ["Whole Body/Systemic", "Skin"], "symptoms": ["Fatigue", "Unexplained weight loss", "Painless neck or armpit lumps", "Hard painless lump in breast"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["An aggressive, fast-growing subtype of breast cancer that lacks the three common receptors that fuel most breast cancers.", "It disproportionately affects Black women, tends to spread quickly, and requires urgent identification."], "doIHaveIt": ["Have you discovered a firm, hard, completely painless lump in your breast that appeared suddenly and has grown noticeably larger in just a few weeks?", "Has the skin over your breast rapidly developed an unusual red, swollen, or warm appearance that looks like an infection but fails to improve with skin creams?", "Have you noticed a new, painful swelling or hard knot deep inside your armpit or along your collarbone?"], "whatShouldIDo": ["Be aware that because this cancer lacks standard receptors, it cannot be treated with common hormonal therapies. It responds best to fast surgical intervention and chemotherapy.", "Do not delay seeking care to try traditional herbal compresses or dietary changes; this specific cancer variant grows too aggressively for delayed action."], "whenToSeeDoctor": ["Schedule an urgent clinical evaluation the moment you notice any rapid-growing, firm lump in your breast tissue or armpit. Early diagnosis is the most vital factor for successful treatment."]}, {"name": "Tuberculosis (Pulmonary)", "categories": ["Whole Body/Systemic", "Respiratory/Chest"], "symptoms": ["High, sudden fever", "Cough or rapid breathing", "Fatigue", "Unexplained weight loss", "Cough w/ phlegm or blood"], "urgency": "Urgent", "whatIsIt": ["A highly contagious bacterial infection of the lungs spread through tiny airborne droplets when an infected person coughs or sneezes.", "It is highly prevalent in areas with overcrowding, poverty, or high rates of HIV."], "doIHaveIt": ["Have you been suffering from a persistent, heavy cough that has lasted for more than three consecutive weeks?", "Does your cough frequently bring up thick phlegm mixed with visible streaks of red blood?", "Are your chronic coughs accompanied by a low-grade fever, severe drenching sweats at night, and a dramatic, unintended loss of body weight?"], "whatShouldIDo": ["Airborne Isolation: Sleep in a separate room with windows left wide open to ensure constant ventilation, which helps clear floating bacteria from the air. Wear a mask when near family.", "Always cover your mouth and nose fully with your elbow or a cloth when coughing or sneezing, and dispose of phlegm rags safely.", "Commit to completing your full 6-month course of prescribed TB antibiotics exactly as directed, even if you feel completely healthy after month two. Stopping early causes dangerous drug-resistant strains."], "whenToSeeDoctor": ["Visit a health post or tuberculosis center immediately for a sputum (phlegm) test if you have a cough lasting over 3 weeks, night sweats, or are coughing up blood."]}, {"name": "Tuberculosis (Zoonotic)", "categories": ["Whole Body/Systemic", "Respiratory/Chest"], "symptoms": ["Chronic fever", "Fatigue", "Unexplained weight loss", "Cough w/ phlegm or blood"], "urgency": "Urgent", "whatIsIt": ["A variant of tuberculosis caused by a bacterium (Mycobacterium bovis) passed from infected cattle to humans.", "It is primarily spread through the consumption of raw, unpasteurized milk or close contact with livestock.", "Unlike standard TB, it frequently infects organs outside the lungs, such as the gut or lymph nodes."], "doIHaveIt": ["Do you live in a rural or farming area and regularly consume unpasteurized (raw) milk, cheese, or herd livestock?", "Have you developed firm, painless, swollen lumps (lymph nodes) in your neck that slowly grow over weeks, sometimes breaking through the skin to leak fluid?", "Are you suffering from long-term, unexplained stomach pain, chronic diarrhea, progressive weight loss, and a low-grade fever with night sweats?", "(If lung-involved): Have you had a persistent cough for more than 3 weeks that is completely unresponsive to standard cough medicines?"], "whatShouldIDo": ["Boil Your Milk: Always boil raw milk before drinking it or using it to make dairy products. High heat completely kills the bacterium.", "Keep the patient's towels and utensils separate, and ensure any leaking skin sores are kept covered with clean dressings.", "Understand that this condition cannot be treated with standard over-the-counter antibiotics; it requires a specialized, strict multi-month regimen of prescription anti-TB medications."], "whenToSeeDoctor": ["Visit a health clinic if you develop chronic, unresolving neck swellings, persistent stomach pain, or a long-term cough, especially if you have a history of drinking raw milk or working with sick cattle."]}, {"name": "Type 2 Diabetes", "categories": ["Whole Body/Systemic", "Cardiovascular", "Vision/Eyes", "Fluid/Metabolism Changes"], "symptoms": ["Fatigue", "Unexplained weight loss", "Leg pain while walking (stops at rest)", "Cloudy/blurry vision", "Extreme dehydration, constant hunger"], "urgency": "Semi-Urgent", "whatIsIt": ["A chronic metabolic disease where your body becomes resistant to insulin, causing dangerous amounts of sugar to build up in your blood.", "Over time, high blood sugar destroys your eyes, kidneys, nerves, and heart."], "doIHaveIt": ["Are you plagued by an unquenchable, constant thirst that forces you to drink liters of water daily, combined with a need to urinate every hour, especially at night?", "Are you experiencing a constant, intense hunger and sudden weight loss, despite eating far more food than usual?", "Have you noticed a complete loss of feeling or a persistent \"pins and needles\" numbness in your feet, or are small cuts on your legs taking weeks to heal?"], "whatShouldIDo": ["Radical Dietary Shift: Cut out all refined sugars, sweet sodas, candies, and white bread from your daily diet. Focus on high-fiber vegetables, whole grains, and beans, which prevent blood sugar spikes.", "Daily Foot Care: Check the bottoms of both feet every single day for tiny cuts or blisters. Because diabetes numbs nerve endings, you can step on a sharp object, get an infection, and never feel it.", "Engage in regular physical work or walking to help your muscles burn off excess blood sugar naturally."], "whenToSeeDoctor": ["Visit a health center for a simple finger-prick blood sugar test if you suffer from extreme thirst, frequent urination, or non-healing foot sores. Seek emergency care if you become deeply confused or start breathing rapidly and deeply (signs of diabetic ketoacidosis)."]}, {"name": "Typhoid Fever", "categories": ["Whole Body/Systemic", "Muscular/Neurological"], "symptoms": ["High, sudden fever", "Severe headache/body aches", "Sudden confusion, slurred speech"], "urgency": "Emergency (Very Urgent)", "whatIsIt": ["A life-threatening bacterial infection caused by consuming food or water contaminated with salmonella bacteria from human waste.", "It multiplies in the bloodstream and can cause severe intestinal tearing and bleeding."], "doIHaveIt": ["Are you suffering from a slowly rising, high fever that gets progressively hotter each day, reaching an intense peak?", "Is your high fever accompanied by a very slow heart rate, an intense headache, a dry cough, and extreme weakness?", "Do you have severe stomach pain with either severe constipation or watery green diarrhea, occasionally accompanied by faint pink spots on your chest?"], "whatShouldIDo": ["Strict Fluid Therapy: Maintain continuous hydration with clean, boiled water or ORS to replace fluid lost to high fever and gastrointestinal issues.", "Rigorous Sanitation: The patient must wash hands with soap after using the toilet, and their food must be prepared separately to avoid spreading the bacteria to the rest of the household.", "Understand that typhoid requires target antibiotic treatment from a clinic to clear the bacteria from your system safely."], "whenToSeeDoctor": ["Seek clinical care immediately for antibiotic therapy. If a typhoid patient develops a sudden, severe worsening of abdominal pain, begins vomiting blood, or lapses into a state of extreme delirium or confusion, treat it as a critical surgical emergency."]}, {"name": "Vitamin A Deficiency", "categories": ["Vision/Eyes"], "symptoms": ["Night blindness"], "urgency": "Non-Urgent", "whatIsIt": ["A severe nutritional deficiency caused by a lack of vitamin A-rich foods in the diet.", "It is a massive cause of preventable childhood blindness and immune collapse in low-development regions."], "doIHaveIt": ["Do you or your children suffer from night blindness, meaning you can see perfectly fine during bright daylight, but become completely blind as soon as the sun sets or you enter a dim room?", "Are the whites of your eyes looking extremely dry, wrinkled, or dull, and have you noticed small, triangular, foamy gray spots forming on them? (Known as Bitot's spots).", "Are your young children suffering from constant, dry, scaly skin and catching severe diarrhea or respiratory infections far more frequently than other kids?"], "whatShouldIDo": ["Dietary Enrichment: Immediately increase your consumption of foods rich in Vitamin A: dark leafy greens, orange fruits and vegetables (carrots, sweet potatoes, pumpkins, papayas), eggs, and fish liver oils.", "Encourage long-term breastfeeding for infants, as breastmilk is a vital natural source of Vitamin A for developing babies.", "Participate in local child health days, where health posts distribute free high-dose Vitamin A capsules twice a year to children under five."], "whenToSeeDoctor": ["Visit a health post if a child displays any signs of night blindness or severe eye dryness. Correcting this deficiency early prevents the cornea from softening and causing irreversible, total blindness."]}, {"name": "Yellow Fever", "categories": ["Whole Body/Systemic", "Stomach/Intestines", "Skin", "Maternal/Bleeding"], "symptoms": ["High, sudden fever", "Severe headache/body aches", "Upper abdominal pain", "Swollen belly or liver/bladder issues", "Yellowing of skin/eyes", "Bleeding from gums, nose, or wounds after a bite"], "urgency": "Emergency (Very Urgent)", "whatIsIt": ["A severe, mosquito-borne viral hemorrhagic fever found in tropical regions of Africa and South America.", "It damages liver tissue, causes sudden internal bleeding, and carries a high mortality rate once advanced."], "doIHaveIt": ["Did you suddenly develop a high fever, severe chills, an intense backache, and generalized muscle pain that makes you feel utterly incapacitated?", "After temporarily feeling better for a day, has your fever returned with a vengeance, accompanied by a striking yellowing of your skin and eyes (jaundice)?", "Are you experiencing severe abdominal pain and beginning to vomit dark, altered blood (\"black vomit\") or bleed from your nose and gums?"], "whatShouldIDo": ["Do NOT take Aspirin or Ibuprofen, which increase your risk of severe internal bleeding. Only use Paracetamol.", "Keep the patient resting comfortably under a mosquito net during the day to prevent local mosquitoes from biting them and spreading the virus to neighbors.", "Drink oral rehydration solutions continuously to fight dehydration caused by persistent vomiting and high fever."], "whenToSeeDoctor": ["Seek immediate hospital care if a fever returns accompanied by yellow skin, dark urine, or spontaneous bleeding."]}];
+
+  const CATEGORY_ORDER = [
+    "Whole Body/Systemic",
+    "Respiratory/Chest",
+    "Cardiovascular",
+    "Stomach/Intestines",
+    "Skin",
+    "Vision/Eyes",
+    "Muscular/Neurological",
+    "Maternal/Bleeding",
+    "Fluid/Metabolism Changes"
+  ];
+
+  const URGENCY_RANK = {
+    "Resuscitation (Immediate)": 0,
+    "Emergency (Very Urgent)": 1,
+    "Urgent": 2,
+    "Semi-Urgent": 3,
+    "Non-Urgent": 4
+  };
+
+  const URGENCY_CLASS = {
+    "Resuscitation (Immediate)": "urgency-resuscitation",
+    "Emergency (Very Urgent)": "urgency-emergency",
+    "Urgent": "urgency-urgent",
+    "Semi-Urgent": "urgency-semi",
+    "Non-Urgent": "urgency-non"
+  };
+
+  let selectedCategories = new Set();
+  let selectedSymptoms = new Set();
+
+  const stepCategoryEl = document.getElementById("mck-step-category");
+  const stepSymptomEl = document.getElementById("mck-step-symptom");
+  const stepResultsEl = document.getElementById("mck-step-results");
+
+  function showStep(step){
+    stepCategoryEl.style.display = step === "category" ? "" : "none";
+    stepSymptomEl.style.display = step === "symptom" ? "" : "none";
+    stepResultsEl.style.display = step === "results" ? "" : "none";
+    document.getElementById("mck-root").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderCategoryStep(){
+    let html = `
+      <p class="step-label">Step 1 of 3</p>
+      <p class="step-instructions">Select every area that applies. You can select more than one, and tap again to deselect.</p>
+      <div class="chip-group" id="mck-category-chips"></div>
+      <div class="actions">
+        <button class="btn primary" id="mck-to-symptoms" disabled>Next: choose symptoms</button>
+      </div>
+    `;
+    stepCategoryEl.innerHTML = html;
+
+    const chipGroup = document.getElementById("mck-category-chips");
+    CATEGORY_ORDER.forEach(cat => {
+      const chip = document.createElement("button");
+      chip.className = "chip";
+      chip.textContent = cat;
+      chip.addEventListener("click", () => {
+        if(selectedCategories.has(cat)){
+          selectedCategories.delete(cat);
+          chip.classList.remove("selected");
+        } else {
+          selectedCategories.add(cat);
+          chip.classList.add("selected");
+        }
+        document.getElementById("mck-to-symptoms").disabled = selectedCategories.size === 0;
+      });
+      chipGroup.appendChild(chip);
+    });
+
+    document.getElementById("mck-to-symptoms").addEventListener("click", () => {
+      renderSymptomStep();
+      showStep("symptom");
+    });
+  }
+
+  function renderSymptomStep(){
+    let html = `
+      <p class="step-label">Step 2 of 3</p>
+      <p class="step-instructions">Select every symptom that applies. Tap again to deselect.</p>
+    `;
+
+    CATEGORY_ORDER.filter(c => selectedCategories.has(c)).forEach(cat => {
+      html += `
+        <div class="symptom-group">
+          <p class="symptom-group-title">${cat}</p>
+          <div class="chip-group" data-category="${cat}"></div>
+        </div>
+      `;
+    });
+
+    html += `
+      <div class="actions">
+        <button class="btn" id="mck-back-to-categories">Back</button>
+        <button class="btn primary" id="mck-to-results" disabled>See results</button>
+      </div>
+    `;
+
+    stepSymptomEl.innerHTML = html;
+
+    CATEGORY_ORDER.filter(c => selectedCategories.has(c)).forEach(cat => {
+      const group = stepSymptomEl.querySelector(`.chip-group[data-category="${CSS.escape(cat)}"]`);
+      TAXONOMY[cat].forEach(sym => {
+        const chip = document.createElement("button");
+        chip.className = "chip";
+        if(selectedSymptoms.has(sym)) chip.classList.add("selected");
+        chip.textContent = sym;
+        chip.addEventListener("click", () => {
+          if(selectedSymptoms.has(sym)){
+            selectedSymptoms.delete(sym);
+            chip.classList.remove("selected");
+          } else {
+            selectedSymptoms.add(sym);
+            chip.classList.add("selected");
+          }
+          document.getElementById("mck-to-results").disabled = selectedSymptoms.size === 0;
+        });
+        group.appendChild(chip);
+      });
+    });
+
+    document.getElementById("mck-to-results").disabled = selectedSymptoms.size === 0;
+
+    document.getElementById("mck-back-to-categories").addEventListener("click", () => {
+      showStep("category");
+    });
+
+    document.getElementById("mck-to-results").addEventListener("click", () => {
+      renderResultsStep();
+      showStep("results");
+    });
+  }
+
+  function paragraphsHtml(paragraphs){
+    return paragraphs.map(p => `<p>${escapeHtml(p)}</p>`).join("");
+  }
+
+  function listHtml(items){
+    return `<ul>${items.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ul>`;
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function renderResultsStep(){
+    const matches = RECORDS.map(r => {
+      const matchCount = r.symptoms.filter(s => selectedSymptoms.has(s)).length;
+      return { record: r, matchCount };
+    }).filter(m => m.matchCount > 0);
+
+    matches.sort((a, b) => {
+      if(b.matchCount !== a.matchCount) return b.matchCount - a.matchCount;
+      const rankA = URGENCY_RANK[a.record.urgency] ?? 99;
+      const rankB = URGENCY_RANK[b.record.urgency] ?? 99;
+      if(rankA !== rankB) return rankA - rankB;
+      return a.record.name.localeCompare(b.record.name);
+    });
+
+    let html = `
+      <p class="step-label">Step 3 of 3</p>
+      <p class="results-summary">${matches.length} possible match${matches.length === 1 ? "" : "es"} based on ${selectedSymptoms.size} selected symptom${selectedSymptoms.size === 1 ? "" : "s"}, sorted by closest match and urgency.</p>
+    `;
+
+    if(matches.length === 0){
+      html += `<div class="no-results">No conditions in this list matched your selected symptoms. This doesn't rule anything out — if you're concerned, please check with a health worker or doctor.</div>`;
+    } else {
+      matches.forEach(m => {
+        const r = m.record;
+        const urgencyClass = URGENCY_CLASS[r.urgency] || "urgency-non";
+        const matchedNames = r.symptoms.filter(s => selectedSymptoms.has(s));
+        html += `
+          <div class="result-card">
+            <div class="result-head">
+              <p class="result-name">${escapeHtml(r.name)}</p>
+              <span class="urgency-pill ${urgencyClass}">${escapeHtml(r.urgency)}</span>
+            </div>
+            <p class="match-tag">Matches ${m.matchCount} of ${r.symptoms.length} listed symptoms: ${matchedNames.map(escapeHtml).join(", ")}</p>
+
+            <details>
+              <summary>What is it?</summary>
+              <div class="section-body">${paragraphsHtml(r.whatIsIt)}</div>
+            </details>
+
+            <details>
+              <summary>Do I have it?</summary>
+              <div class="section-body">${listHtml(r.doIHaveIt)}</div>
+            </details>
+
+            <details>
+              <summary>What should I do?</summary>
+              <div class="section-body">${listHtml(r.whatShouldIDo)}</div>
+            </details>
+
+            <details>
+              <summary>When to see a doctor?</summary>
+              <div class="section-body">${paragraphsHtml(r.whenToSeeDoctor)}</div>
+            </details>
+          </div>
+        `;
+      });
+    }
+
+    html += `
+      <div class="actions">
+        <button class="btn" id="mck-back-to-symptoms">Back</button>
+        <button class="btn" id="mck-start-over">Start over</button>
+        <span class="save-note" id="mck-save-note"></span>
+      </div>
+    `;
+
+    stepResultsEl.innerHTML = html;
+
+    document.getElementById("mck-back-to-symptoms").addEventListener("click", () => {
+      renderSymptomStep();
+      showStep("symptom");
+    });
+
+    document.getElementById("mck-start-over").addEventListener("click", resetAll);
+
+    saveToDatabase(matches);
+  }
+
+  function saveToDatabase(matches){
+    const payload = {
+      categories: Array.from(selectedCategories),
+      symptoms: Array.from(selectedSymptoms),
+      matches: matches.map(m => ({ name: m.record.name, urgency: m.record.urgency, matchCount: m.matchCount })),
+      timestamp: new Date().toISOString()
+    };
+
+    const noteEl = document.getElementById("mck-save-note");
+
+    // Hook point: this calls into Bubble via the Toolbox plugin's
+    // bubble_fn_ bridge. Define bubble_fn_saveSelfCheck in a Bubble
+    // workflow ("An external JavaScript action is called") to receive
+    // this payload and create a database record from it.
+    if(typeof bubble_fn_saveSelfCheck === "function"){
+      try{
+        bubble_fn_saveSelfCheck(JSON.stringify(payload));
+        if(noteEl) noteEl.textContent = "Saved.";
+      } catch(err){
+        if(noteEl) noteEl.textContent = "Could not save automatically.";
+      }
+    }
+  }
+
+  function resetAll(){
+    selectedCategories = new Set();
+    selectedSymptoms = new Set();
+    renderCategoryStep();
+    showStep("category");
+  }
+
+  renderCategoryStep();
+  showStep("category");
+})();
+</script>
+
+<script src="./register-sw.js"></script>
+</body>
+</html>

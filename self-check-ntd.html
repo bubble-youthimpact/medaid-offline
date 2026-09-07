@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NTD Symptom Self-Check</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="theme-color" content="#156569">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MEDAID">
+<style>
+  .mck-back-nav{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size:13px;
+    color:#63605A;
+    text-decoration:none;
+    padding: 16px 16px 0;
+  }
+</style>
+</head>
+<body>
+<a class="mck-back-nav" href="./index.html">&larr; Back to Home</a>
+<link rel="stylesheet" href="./fonts/fonts.css">
+
+<style>
+  /* Everything is scoped under .ntd-widget so this can never restyle
+     the host page — Bubble's HTML element is not sandboxed, and a
+     <style> tag applies document-wide regardless of where it sits in
+     the DOM, so bare `body`, `html`, or `*` selectors would leak out. */
+
+  .ntd-widget, .ntd-widget *{
+    box-sizing: border-box;
+  }
+
+  .ntd-widget{
+    --paper: #FFFFFF;
+    --card: #FFFFFF;
+    --ink: #2B2A28;
+    --ink-soft: #63605A;
+    --sage: #5D7F63;
+    --sage-soft: #E4EBE2;
+    --clay: #B5654F;
+    --clay-soft: #F3E4DF;
+    --maroon: #7A2E2E;
+    --maroon-soft: #EFD9D8;
+    --amber: #B9762F;
+    --amber-soft: #F3E5D1;
+    --gold: #A69433;
+    --gold-soft: #F0ECD3;
+    --purple: #77ac78;
+    --line: #DEDAD0;
+    --radius: 14px;
+
+    /* urgency badge palette */
+    --u-nonurgent-soft: #BFE1F6;
+    --u-nonurgent-text: #1F5C7A;
+    --u-semiurgent-soft: #D4EDBC;
+    --u-semiurgent-text: #4B7A2F;
+    --u-urgent-soft: #FFE5A0;
+    --u-urgent-text: #8A6A1F;
+    --u-emergency-soft: #FFC8AA;
+    --u-emergency-text: #A6502A;
+    --u-resus-soft: #FFCFC9;
+    --u-resus-text: #A13A32;
+
+    display: block;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    container-type: inline-size;
+    container-name: ntd-root;
+  }
+
+  .ntd-widget .eyebrow{
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 4px;
+  }
+
+  .ntd-widget h1{
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 14px;
+    line-height: 1.25;
+  }
+
+  .ntd-widget .disclaimer{
+    background: var(--maroon-soft);
+    border: 1px solid var(--maroon);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 22px;
+  }
+
+  .ntd-widget .disclaimer strong{
+    color: var(--maroon);
+  }
+
+  .ntd-widget .step-label{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin: 0 0 4px;
+  }
+
+  .ntd-widget .step-instructions{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+  }
+
+  .ntd-widget .chip-group{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .ntd-widget .chip{
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: var(--ink);
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .ntd-widget .chip.selected{
+    background: var(--purple);
+    border-color: var(--purple);
+    color: #fff;
+  }
+
+  .ntd-widget .symptom-group{
+    margin-bottom: 18px;
+  }
+
+  .ntd-widget .symptom-group-title{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+
+  .ntd-widget .actions{
+    margin-top: 20px;
+    display:flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .ntd-widget .btn,
+  .ntd-widget .btn:hover,
+  .ntd-widget .btn:focus,
+  .ntd-widget .btn:active,
+  .ntd-widget .btn:visited{
+    font-family: inherit !important;
+    font-size: 14px !important;
+    border-radius: 10px !important;
+    padding: 10px 16px !important;
+    cursor: pointer !important;
+    border: 1px solid var(--line) !important;
+    background: var(--card) !important;
+    background-color: var(--card) !important;
+    color: var(--ink) !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: none !important;
+  }
+
+  .ntd-widget .btn.primary,
+  .ntd-widget .btn.primary:hover,
+  .ntd-widget .btn.primary:focus,
+  .ntd-widget .btn.primary:active,
+  .ntd-widget .btn.primary:visited{
+    background: var(--purple) !important;
+    background-color: var(--purple) !important;
+    border-color: var(--purple) !important;
+    color: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .ntd-widget .btn:disabled{
+    opacity: 0.4;
+    cursor: default !important;
+  }
+
+  .ntd-widget .results-summary{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+  }
+
+  .ntd-widget .result-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+
+  .ntd-widget .result-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .ntd-widget .result-name{
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    flex: 1 1 auto;
+  }
+
+  .ntd-widget .urgency-pill{
+    display:inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .ntd-widget .urgency-resuscitation{ background: var(--u-resus-soft); color: var(--u-resus-text); }
+  .ntd-widget .urgency-emergency{ background: var(--u-emergency-soft); color: var(--u-emergency-text); }
+  .ntd-widget .urgency-urgent{ background: var(--u-urgent-soft); color: var(--u-urgent-text); }
+  .ntd-widget .urgency-semi{ background: var(--u-semiurgent-soft); color: var(--u-semiurgent-text); }
+  .ntd-widget .urgency-non{ background: var(--u-nonurgent-soft); color: var(--u-nonurgent-text); }
+
+  @container ntd-root (max-width: 480px){
+    .ntd-widget .result-head{
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .ntd-widget .urgency-pill{
+      order: -1;
+    }
+  }
+
+  .ntd-widget .match-tag{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 6px 0 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .ntd-widget details{
+    margin-top: 10px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+
+  .ntd-widget details:first-of-type{
+    margin-top: 12px;
+  }
+
+  .ntd-widget summary{
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    list-style: none;
+  }
+
+  .ntd-widget summary::-webkit-details-marker{ display:none; }
+
+  .ntd-widget summary::before{
+    content: "▸ ";
+    color: var(--ink-soft);
+  }
+
+  .ntd-widget details[open] summary::before{
+    content: "▾ ";
+  }
+
+  .ntd-widget .section-body{
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 8px;
+  }
+
+  .ntd-widget .section-body p{
+    margin: 0 0 10px;
+  }
+
+  .ntd-widget .section-body p:last-child{
+    margin-bottom: 0;
+  }
+
+  .ntd-widget .section-body ul{
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  .ntd-widget .section-body li{
+    margin-bottom: 8px;
+  }
+
+  .ntd-widget .section-body li:last-child{
+    margin-bottom: 0;
+  }
+
+  .ntd-widget .no-results{
+    font-size: 14px;
+    color: var(--ink-soft);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+
+  .ntd-widget .save-note{
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+</style>
+
+<div class="ntd-widget" id="ntd-root">
+  <p class="eyebrow">Self Check</p>
+  <h1>NTD Symptom Self-Check</h1>
+  <div class="disclaimer">
+    <strong>This is not a diagnosis.</strong> This tool is for general, educational self-check purposes only and does not replace professional medical care. If this is a medical emergency, seek immediate help from a doctor, clinic, or emergency service.
+  </div>
+
+  <div id="ntd-step-category"></div>
+  <div id="ntd-step-symptom" style="display:none;"></div>
+  <div id="ntd-step-results" style="display:none;"></div>
+</div>
+
+<script>
+(function(){
+  const TAXONOMY = {"Skin": ["Skin Ulcers / Open Sores", "Swelling, Lumps Under Skin", "Rashes, Bumps, & Itching", "Skin Color Changes / Thickening", "Oral Sores / Facial Damage"], "Whole Body / Systemic": ["High Fever / Chills", "Extreme Fatigue / Weakness", "Unexplained Weight Loss"], "Stomach / Intestines": ["Abdominal Pain / Swelling", "Severe Diarrhea or Vomiting", "Very Bad Breath"], "Maternal / Bleeding": ["Unusual Bleeding or Bruising"], "Muscular / Neurological": ["Severe Joint or Muscle Pain", "Bone & Limb Deformities", "Numbness / Loss of Sensation", "Seizures, Spasms, or Paralysis", "Confusion / Altered Mental State"], "Vision / Eyes": ["Vision Changes", "Eye Irritation"]};
+
+  const RECORDS = [{"name": "Buruli Ulcer", "categories": ["Skin"], "symptoms": ["Skin Ulcers / Open Sores", "Swelling, Lumps Under Skin"], "urgency": "Semi-Urgent (1-2 Weeks)", "whatIsIt": ["A chronic, destructive infection of the skin and underlying soft tissue caused by the bacterium Mycobacterium ulcerans."], "doIHaveIt": ["Do you have a painless, firm lump, swelling, or thick skin patch?", "Has a area of skin opened up into a deep, expanding sore with undermined edges?", "Have you spent time in rural, warm, humid areas with slow-moving water?"], "whatShouldIDo": ["Keep any open wounds clean and covered with sterile dressings.", "Do not attempt to squeeze, pop, or apply harsh chemicals to the lesion."], "whenToSeeDoctor": ["See a healthcare provider within days to 1–2 weeks if a painless lump or non-healing sore appears to prevent extensive tissue damage."], "prevention": ["Use insect repellent and wear long, loose-fitting clothing to avoid insect bites", "Protect cuts and scratches with clean dressings and wash them promptly with soap", "Wear gardening gloves and long sleeves when working outdoors or handling soil"]}, {"name": "Chagas Disease", "categories": ["Stomach / Intestines", "Whole Body / Systemic"], "symptoms": ["High Fever / Chills", "Extreme Fatigue / Weakness", "Abdominal Pain / Swelling"], "urgency": "Emergency (Few Hours)", "whatIsIt": ["An infection caused by the parasite Trypanosoma cruzi, transmitted by triatomine bugs (\"kissing bugs\"), which can lead to severe heart and digestive complications over time."], "doIHaveIt": ["Do you have swelling on one eyelid (Romaña's sign) or a red sore near a bug bite?", "Are you experiencing fever, body aches, fatigue, or swollen glands?", "Do you have a history of living in or visiting rural areas of Central or South America?"], "whatShouldIDo": ["Rest, avoid strenuous physical exertion if you feel heart palpitations", "Minimize exposure to vector insects."], "whenToSeeDoctor": ["Seek emergency medical care (within hours) if you experience chest pain, shortness of breath, irregular heartbeats, or sudden fainting."], "prevention": ["Avoid contact with triatomine bugs by staying in well-built housing and using insecticide-treated bed nets", "Seal cracks, gaps, and window screens around the home to prevent bugs from entering", "Practice good hygiene during food preparation and storage to prevent contamination"]}, {"name": "Dengue Fever", "categories": ["Maternal / Bleeding", "Skin", "Whole Body / Systemic"], "symptoms": ["High Fever / Chills", "Extreme Fatigue / Weakness", "Rashes, Bumps, & Itching", "Unusual Bleeding or Bruising"], "urgency": "Emergency (Few Hours)", "whatIsIt": ["A viral infection spread by Aedes mosquitoes that causes sudden high fevers, intense muscle pain, and, in severe cases, dangerous internal bleeding."], "doIHaveIt": ["Did you suddenly develop a high fever along with a severe headache or pain behind your eyes?", "Are you experiencing severe joint or muscle pain (\"breakbone fever\") and a red skin rash?", "Have you recently been in an area with active mosquito activity or dengue outbreaks?"], "whatShouldIDo": ["Rest and stay hydrated with fluids and oral rehydration solutions.", "Take acetaminophen/paracetamol for fever, but avoid aspirin or ibuprofen, as they increase bleeding risks."], "whenToSeeDoctor": ["Go to an emergency room immediately if you notice severe abdominal pain, persistent vomiting, bleeding from gums/nose, or extreme fatigue."], "prevention": ["Use insect repellent containing DEET, picaridin, or IR3535 on exposed skin and clothing", "Wear long-sleeved shirts and long pants to cover your arms and legs", "Eliminate standing water around the home where mosquitoes can breed"]}, {"name": "Echinococcosis", "categories": ["Muscular / Neurological", "Stomach / Intestines", "Whole Body / Systemic"], "symptoms": ["Unexplained Weight Loss", "Abdominal Pain / Swelling", "Severe Joint or Muscle Pain"], "urgency": "Non-Urgent (Routine Checks)", "whatIsIt": ["A parasitic tapeworm infection caused by larval stages of Echinococcus, which form slow-growing, fluid-filled cysts in the liver, lungs, or other organs."], "doIHaveIt": ["Do you have dull pain or a feeling of fullness in your upper right abdomen?", "Are you experiencing chronic coughing or chest discomfort without an obvious cause?", "Have you had close contact with farm dogs or livestock in rural regions?"], "whatShouldIDo": ["Avoid pushing or applying heavy pressure to any palpable mass in your abdomen"], "whenToSeeDoctor": ["Schedule a routine appointment for an ultrasound or scan if you suspect a cyst. Seek emergency care immediately if you experience sudden intense abdominal pain, severe hives, or difficulty breathing (signs of a cyst rupture)."], "prevention": ["Wash your hands thoroughly with soap and warm water after handling dogs and before eating.", "Do not let dogs eat raw meat, carcasses, or organs from farm animals or wildlife.", "Avoid food or water that may be contaminated by dog feces, and wash all fruits or vegetables before consumption."]}, {"name": "Elephantiasis", "categories": ["Muscular / Neurological", "Skin", "Whole Body / Systemic"], "symptoms": ["Extreme Fatigue / Weakness", "Swelling, Lumps Under Skin", "Skin Color Changes / Thickening", "Bone & Limb Deformities"], "urgency": "Non-Urgent (Routine Checks)", "whatIsIt": ["A parasitic infection spread by mosquitoes where microscopic worms block the lymphatic system, leading to severe, painful swelling of limbs and genitalia."], "doIHaveIt": ["Is one of your legs, arms, or groin areas experiencing chronic, significant swelling?", "Has the skin over the swollen area become thick, dark, firm, or rough?", "Do you live in or frequently travel to tropical regions where mosquito bites are common?"], "whatShouldIDo": ["Wash the affected limb daily with soap and clean water", "Elevate the limb when resting", "Prevent skin cracks."], "whenToSeeDoctor": ["Consult a doctor for routine management and antiparasitic treatment, or urgently if you develop sudden fever, redness, or heat in the swollen limb (secondary infection)."], "prevention": ["Sleep under a mosquito net, especially during evening and early morning hours", "Wear long-sleeved shirts and long pants to cover exposed skin", "Use insect repellent daily on any exposed skin"]}, {"name": "Foodborne Trematodiases", "categories": ["Skin", "Stomach / Intestines", "Whole Body / Systemic"], "symptoms": ["High Fever / Chills", "Rashes, Bumps, & Itching", "Abdominal Pain / Swelling", "Severe Diarrhea or Vomiting"], "urgency": "Urgent (24-48 Hours)", "whatIsIt": ["Parasitic fluke infections (such as liver flukes or lung flukes) acquired by eating raw or undercooked fish, crustaceans, or water plants."], "doIHaveIt": ["Do you have upper abdominal pain, indigestion, or yellowing of the skin/eyes (jaundice)?", "Do you have a chronic cough with rusty-colored or bloody sputum?", "Have you recently eaten raw or inadequately cooked freshwater fish, crabs, or watercress?"], "whatShouldIDo": ["Avoid consuming raw or undercooked aquatic animals and plants.", "Maintain adequate fluid intake if experiencing stomach upset."], "whenToSeeDoctor": ["Seek care within 24–48 hours if you experience persistent abdominal pain, jaundice, high fever, or are coughing up blood."], "prevention": ["Cook freshwater fish, crustaceans, and aquatic plants thoroughly", "Wash cutting boards and utensils with clean water after handling raw seafood"]}, {"name": "Guinea Worm Disease", "categories": ["Skin", "Whole Body / Systemic"], "symptoms": ["High Fever / Chills", "Skin Ulcers / Open Sores", "Swelling, Lumps Under Skin"], "urgency": "Semi-Urgent (1-2 Weeks)", "whatIsIt": ["A parasitic infection caused by drinking water contaminated with water fleas carrying Guinea worm larvae, resulting in a long worm emerging through a painful skin blister."], "doIHaveIt": ["Do you have a painful, burning blister or ulcer, usually on your lower legs or feet?", "Can you see or feel a thin, white worm beginning to emerge from the blister?", "Have you drank unfiltered water from open ponds or stagnant sources in endemic areas?"], "whatShouldIDo": ["Immerse the blister in a bucket of water to encourage the worm to emerge", "Never pull hard or break the worm, as this causes severe inflammation and infection.", "Slowly wind the emerging worm around a stick each day."], "whenToSeeDoctor": ["Visit a healthcare facility within a few days for safe, controlled worm extraction, wound care, and tetanus vaccination."], "prevention": ["Protect against sand fly bites by applying insect repellent containing DEET", "Cover exposed skin by wearing long-sleeved shirts, long pants, and socks", "Avoid outdoor activities from dusk to dawn when sand flies are most active, and sleep under a mesh bed net"]}, {"name": "Intestinal Worms", "categories": ["Stomach / Intestines", "Whole Body / Systemic"], "symptoms": ["Extreme Fatigue / Weakness", "Unexplained Weight Loss", "Abdominal Pain / Swelling", "Severe Diarrhea or Vomiting"], "urgency": "Non-Urgent (Routine Checks)", "whatIsIt": ["Infections caused by intestinal parasites (such as hookworms, roundworms, or whipworms) transmitted through contact with soil contaminated by human feces."], "doIHaveIt": ["Do you have frequent abdominal bloating, vague belly pain, or loose stools?", "Are you experiencing constant fatigue, pale skin, or lightheadedness (signs of anemia)?", "Have you walked barefoot or handled soil in areas without modern sanitation?"], "whatShouldIDo": ["Wash your hands thoroughly with soap before eating", "Wash all fruits and vegetables", "Avoid walking barefoot on soil."], "whenToSeeDoctor": ["Schedule a routine outpatient visit for simple oral deworming medication and an anemia check."], "prevention": ["Wash hands thoroughly with soap before eating and after using the toilet", "Wash and peel fruits and vegetables before consuming", "Avoid walking barefoot on potentially contaminated soil"]}, {"name": "Leishmaniasis (Cutaneous)", "categories": ["Skin"], "symptoms": ["Skin Ulcers / Open Sores", "Rashes, Bumps, & Itching"], "urgency": "Semi-Urgent (1-2 Weeks)", "whatIsIt": ["A skin infection caused by Leishmania parasites transmitted by the bite of infected phlebotomine sandflies, causing long-lasting skin ulcers."], "doIHaveIt": ["Do you have one or more skin bumps that have turned into open, raised-edge sores over weeks?", "Are the sores largely painless unless they become infected with bacteria?", "Have you been bitten by tiny sandflies in dry or forested tropical regions?"], "whatShouldIDo": ["Keep the sores clean, dry, and covered to prevent secondary bacterial infections.", "Avoid applying unverified home remedies directly to the ulcers."], "whenToSeeDoctor": ["Consult a healthcare provider within 1–2 weeks to obtain tissue testing and appropriate antiparasitic treatment to minimize scarring."], "prevention": ["Protect yourself from sandfly bites by using insect repellent containing DEET", "Wear long-sleeved shirts and long pants to cover exposed skin", "Sleep under insecticide-treated bed nets when indoors"]}, {"name": "Leishmaniasis (Visceral)", "categories": ["Stomach / Intestines", "Whole Body / Systemic"], "symptoms": ["High Fever / Chills", "Extreme Fatigue / Weakness", "Unexplained Weight Loss", "Abdominal Pain / Swelling"], "urgency": "Urgent (24-48 Hours)", "whatIsIt": ["A severe, internal form of leishmaniasis where parasites attack internal organs—primarily the liver, spleen, and bone marrow."], "doIHaveIt": ["Have you had irregular fevers along with significant weight loss over weeks or months?", "Is your abdomen visibly swollen due to an enlarged spleen or liver?", "Are you experiencing unusual paleness, extreme weakness, or easy bruising?"], "whatShouldIDo": ["Rest, maintain nutrition as tolerated", "Avoid physical trauma to the abdomen to protect the enlarged spleen from rupture."], "whenToSeeDoctor": ["Seek urgent medical evaluation (within 24–48 hours); untreated visceral leishmaniasis is almost universally fatal."], "prevention": ["Sleep under insecticide-treated fine-mesh bed nets and spray indoor walls.", "Cover exposed skin with protective clothing during evening and night hours.", "Seek prompt treatment for infected domestic pets (such as dogs) in endemic areas."]}, {"name": "Leprosy", "categories": ["Muscular / Neurological", "Skin"], "symptoms": ["Skin Color Changes / Thickening", "Numbness / Loss of Sensation", "Seizures, Spasms, or Paralysis", "Bone & Limb Deformities"], "urgency": "Semi-Urgent (1-2 Weeks)", "whatIsIt": ["A chronic bacterial infection caused by Mycobacterium leprae that primarily affects the peripheral nerves, skin, eyes, and mucosal surfaces."], "doIHaveIt": ["Do you have lighter or reddish skin patches that have lost feeling to temperature, touch, or pain?", "Are you experiencing numbness, tingling, or weakness in your hands or feet?", "Do you have painless burns or injuries on your hands or feet that you did not feel happen?"], "whatShouldIDo": ["Protect numb hands and feet from heat, sharp objects, and friction by wearing supportive footwear", "Check your skin daily for unnoticed cuts."], "whenToSeeDoctor": ["Visit a health clinic within days to 1–2 weeks for Multi-Drug Therapy (MDT), which completely cures the infection and stops nerve damage."], "prevention": ["Get vaccinated with the BCG vaccine, especially if living in or traveling to an endemic area", "Avoid close contact with individuals who have untreated leprosy", "Practice good personal hygiene and wash hands regularly with soap"]}, {"name": "Mycetoma", "categories": ["Muscular / Neurological", "Skin"], "symptoms": ["Skin Ulcers / Open Sores", "Swelling, Lumps Under Skin", "Bone & Limb Deformities"], "urgency": "Semi-Urgent (1-2 Weeks)", "whatIsIt": ["A chronic, slow-growing inflammatory infection of the subcutaneous tissue (caused by fungi or bacteria) that can invade muscle and bone."], "doIHaveIt": ["Do you have a firm, painless swelling or lump under the skin, usually on your foot or leg?", "Has the lump developed small openings (sinus tracts) that drain fluid with tiny, colored grains?", "Did you sustain a minor injury (like a thorn prick) while walking barefoot in a dry climate?"], "whatShouldIDo": ["Keep the area clean, dry, and dressed.", "Avoid cutting or puncturing the swelling yourself."], "whenToSeeDoctor": ["See a specialist within 1–2 weeks for a biopsy to determine if it is fungal or bacterial so targeted treatment can begin before bone damage occurs."], "prevention": ["Wear protective footwear and closed-toed shoes to prevent puncture wounds from thorns or sharp objects while walking or working outdoors", "Clean and disinfect skin wounds promptly if injuries occur", "Avoid walking barefoot in endemic rural or agricultural areas"]}, {"name": "Noma\n(Cancrum Oris)", "categories": ["Skin", "Stomach / Intestines"], "symptoms": ["Skin Ulcers / Open Sores", "Oral Sores / Facial Damage", "Very Bad Breath"], "urgency": "Emergency (Few Hours)", "whatIsIt": ["A rapidly spreading gangrenous disease that destroys the soft and hard tissues of the face, occurring mainly in malnourished children with compromised immune systems."], "doIHaveIt": ["Is there a painful ulcer inside the mouth/gums that is rapidly turning dark or black?", "Is there rapidly spreading facial swelling, foul odor, and destruction of lip, cheek, or nose?", "Is the person experiencing high fever, extreme weakness, and a history of severe malnutrition or recent illness?"], "whatShouldIDo": ["Seek immediate professional clinical care; do not attempt home treatment."], "whenToSeeDoctor": ["Go to an emergency facility immediately (within hours). Early intravenous antibiotics and nutritional support are critical to save life and tissue."], "prevention": ["Maintain good nutrition and oral hygiene for children", "Ensure access to clean drinking water and proper sanitation", "Provide routine childhood vaccinations against diseases like measles"]}, {"name": "Rabies", "categories": ["Muscular / Neurological", "Whole Body / Systemic"], "symptoms": ["High Fever / Chills", "Confusion / Altered Mental State", "Seizures, Spasms, or Paralysis"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["A fatal viral encephalomyelitis spread through the saliva of infected animals (most commonly dog bites or scratches)."], "doIHaveIt": ["Were you bitten or scratched by a mammal (dog, bat, monkey) in an area where rabies exists?", "Are you experiencing tingling, pain, or intense itching at the site of a past animal bite?", "Have you developed fever along with agitation, confusion, fear of water, or muscle spasms?"], "whatShouldIDo": ["Immediately wash any animal bite thoroughly with soap and running water for at least 15 minutes."], "whenToSeeDoctor": ["Seek resuscitation-level emergency care immediately. Post-exposure prophylaxis (PEP) must be given before symptoms start; once neurological symptoms appear, the infection is nearly 100% fatal."], "prevention": ["Routinely vaccinate your dogs and cats against rabies", "Keep your distance from wildlife and unfamiliar or stray animals", "Seek immediate medical care and get vaccinated after an animal bite or scratch"]}, {"name": "River Blindness", "categories": ["Skin", "Vision / Eyes"], "symptoms": ["Rashes, Bumps, & Itching", "Skin Color Changes / Thickening", "Vision Changes", "Eye Irritation"], "urgency": "Non-Urgent (Routine Checks)", "whatIsIt": ["An infection caused by the parasitic worm Onchocerca volvulus, transmitted by blackflies, leading to severe skin disease and permanent visual loss."], "doIHaveIt": ["Do you suffer from intense, relentless itching across large areas of your body?", "Do you have firm, painless lumps under your skin or patches of darkened, thickened, or \"leopard-patterned\" skin?", "Are you experiencing eye redness, light sensitivity, or gradually declining vision?"], "whatShouldIDo": ["Avoid scratching the skin to prevent bacterial superinfections.", "Wear protective clothing and insect repellent near fast-flowing rivers."], "whenToSeeDoctor": ["Schedule an outpatient or clinic consultation for antiparasitic treatment (ivermectin) and an eye exam."], "prevention": ["Avoid blackfly bites by using insect repellent containing DEET", "Wear protective clothing such as long-sleeved shirts and pants", "Participate in community mass drug administration programs using ivermectin"]}, {"name": "Scabies", "categories": ["Skin"], "symptoms": ["Rashes, Bumps, & Itching"], "urgency": "Non-Urgent (Routine Checks)", "whatIsIt": ["A highly contagious skin infestation caused by microscopic mites (Sarcoptes scabiei) that burrow into the upper layer of the skin to live and lay eggs."], "doIHaveIt": ["Do you have intense itching that becomes significantly worse at night?", "Do you have a pimple-like rash or tiny, raised burrow lines in skin folds (between fingers, wrists, waistline)?", "Are other members of your household or close contacts experiencing the same itching rash?"], "whatShouldIDo": ["Wash all clothing, bedding, and towels used in the past 3 days in hot water and dry on high heat."], "whenToSeeDoctor": ["Visit a doctor or clinic for a routine consultation to get prescription topical creams (such as permethrin) for yourself and household members."], "prevention": ["Avoid direct, prolonged skin-to-skin contact with an infected person.", "Do not share clothes, towels, or bedding with someone who has an active mite infestation.", "Wash used bedding and clothing in hot water and dry on high heat if exposed."]}, {"name": "Schistosomiasis", "categories": ["Maternal / Bleeding", "Skin", "Stomach / Intestines", "Whole Body / Systemic"], "symptoms": ["High Fever / Chills", "Abdominal Pain / Swelling", "Severe Diarrhea or Vomiting", "Rashes, Bumps, & Itching", "Unusual Bleeding or Bruising"], "urgency": "Urgent (24-48 Hours)", "whatIsIt": ["A disease caused by parasitic flatworms released by freshwater snails, which penetrate the skin and affect the urinary or digestive systems."], "doIHaveIt": ["Do you have pain during urination or visible blood in your urine?", "Do you have chronic abdominal pain, bloody diarrhea, or an enlarged abdomen?", "Have you waded, bathed, or swam in fresh water (lakes, rivers) in endemic areas?"], "whatShouldIDo": ["Avoid swimming or wading in untreated freshwater bodies in endemic regions.", "Towel dry vigorously if exposed to water."], "whenToSeeDoctor": ["Seek medical attention within 24–48 hours if you notice blood in your urine or stool, or experience sudden high fevers after freshwater exposure."], "prevention": ["Avoid swimming, bathing, or wading in freshwater lakes and rivers in endemic areas.", "Boil or safely filter drinking water before use.", "Support community sanitation efforts to keep human waste out of natural water sources."]}, {"name": "Sleeping Sickness", "categories": ["Muscular / Neurological", "Whole Body / Systemic"], "symptoms": ["High Fever / Chills", "Extreme Fatigue / Weakness", "Confusion / Altered Mental State", "Seizures, Spasms, or Paralysis"], "urgency": "Emergency (Few Hours)", "whatIsIt": ["A parasitic infection transmitted by the bite of the tsetse fly in sub-Saharan Africa, which progresses from blood infection to central nervous system involvement."], "doIHaveIt": ["Do you have bout-like fevers, severe headaches, joint pains, and swollen lymph nodes in your neck?", "Are you experiencing severe daytime sleepiness paired with nighttime insomnia?", "Are you experiencing progressive confusion, mood changes, or trouble walking?"], "whatShouldIDo": ["Rest and avoid activities requiring concentration or motor control if feeling confused or excessively sleepy."], "whenToSeeDoctor": ["Seek emergency medical evaluation (within hours) if neurological symptoms or severe sleep cycle changes develop."], "prevention": ["Wear protective, neutral-colored, medium-weight clothing like long pants and long-sleeved shirts", "Avoid bushes, dense forests, and areas where tsetse flies gather", "Inspect vehicles for tsetse flies before entering"]}, {"name": "Snakebite Envenomation", "categories": ["Maternal / Bleeding", "Muscular / Neurological", "Skin", "Whole Body / Systemic"], "symptoms": ["Extreme Fatigue / Weakness", "Skin Ulcers / Open Sores", "Swelling, Lumps Under Skin", "Seizures, Spasms, or Paralysis", "Unusual Bleeding or Bruising"], "urgency": "Resuscitation (Immediate)", "whatIsIt": ["A life-threatening medical emergency caused by the injection of toxins from a venomous snake bite, causing local tissue collapse, bleeding, or paralysis."], "doIHaveIt": ["Were you bitten by a snake, leaving fang marks with rapidly spreading pain and severe swelling?", "Are you experiencing unusual bleeding (gums, wound), dark urine, or widespread bruising?", "Are you experiencing heavy eyelids, difficulty swallowing, weak muscles, or trouble breathing?"], "whatShouldIDo": ["Keep the bitten limb completely still at or slightly below heart level.", "Do NOT cut the wound, attempt to suck out venom, apply a tourniquet, or use ice."], "whenToSeeDoctor": ["Seek immediate emergency resuscitation care. Antivenom must be administered in a hospital setting as quickly as possible."], "prevention": ["Wear sturdy shoes and long trousers when walking in areas where snakes may live", "Never attempt to catch, handle, or provoke a snake, even if it appears to be dead", "Keep grass cut short and areas around houses free of woodpiles or debris where snakes can hide"]}, {"name": "Taeniasis / \nNeurocysticercosis", "categories": ["Muscular / Neurological", "Stomach / Intestines"], "symptoms": ["Abdominal Pain / Swelling", "Seizures, Spasms, or Paralysis", "Confusion / Altered Mental State"], "urgency": "Urgent (24-48 Hours)", "whatIsIt": ["Taeniasis is an intestinal tapeworm infection from eating undercooked pork/beef; Neurocysticercosis occurs when tapeworm eggs are ingested and form larval cysts in the brain."], "doIHaveIt": ["Have you noticed small, white, flat ribbon-like tapeworm segments in your stool?", "Have you experienced a sudden new seizure, severe persistent headache, or confusion?", "Do you live in or travel to areas with free-ranging pigs and variable sanitation?"], "whatShouldIDo": ["Practice strict hand hygiene after using the bathroom and before eating.", "Ensure all pork and meat are cooked thoroughly."], "whenToSeeDoctor": ["Seek urgent medical evaluation (within 24–48 hours) if you experience a new seizure or severe neurological symptoms."], "prevention": ["Wash hands thoroughly with soap and water after using the toilet and before handling food", "Cook all pork and meat completely to safe internal temperatures", "Wash and peel all raw fruits and vegetables before eating"]}, {"name": "Trachoma", "categories": ["Vision / Eyes"], "symptoms": ["Vision Changes", "Eye Irritation"], "urgency": "Semi-Urgent (1-2 Weeks)", "whatIsIt": ["What is it? A contagious bacterial eye infection caused by Chlamydia trachomatis, which causes scarring of the inner eyelid and leads to painful blindness if untreated."], "doIHaveIt": ["Do you have chronic eye irritation, redness, discharge, or light sensitivity?", "Do your eyelashes turn inward and scratch against the front surface of your eye (trichiasis)?", "Do you live in an area with dry climates, poor water access, and high fly density?"], "whatShouldIDo": ["Practice frequent face-washing with clean water", "Avoid sharing towels or washcloths with others."], "whenToSeeDoctor": ["See an eye specialist or clinic within days to 1–2 weeks for antibiotic treatment or corrective eyelid procedures before corneal scarring occurs."], "prevention": ["Wash faces and eyes daily with clean water, especially for young children.", "Keep living areas clean to reduce fly populations that spread the bacteria.", "Avoid sharing personal washcloths, towels, or pillowcases."]}, {"name": "Yaws", "categories": ["Muscular / Neurological", "Skin"], "symptoms": ["Skin Ulcers / Open Sores", "Rashes, Bumps, & Itching", "Bone & Limb Deformities"], "urgency": "Non-Urgent (Routine Checks)", "whatIsIt": ["A chronic bacterial infection caused by Treponema pallidum pertenue that primarily affects skin, bones, and cartilage, mainly in children in warm, humid tropical regions."], "doIHaveIt": ["Did you develop a single, raspberry-like skin sore (\"mother yaw\") that turned into a painless ulcer?", "Do you have widespread yellow-crusted skin bumps or painful swelling over your limb bones?", "Do you have painful bone or joint aches that cause a limping gait (\"crab yaws\")?"], "whatShouldIDo": ["Keep skin clean and cover open lesions to prevent transmission to playmates or family members through direct skin contact."], "whenToSeeDoctor": ["Visit a community health clinic for routine outpatient care; a single dose of oral azithromycin typically clears the infection completely."], "prevention": ["Maintain good personal hygiene by bathing regularly with clean water and soap.", "Avoid direct contact with open skin sores or lesions of infected individuals.", "Ensure all household members get treated promptly if a contact develops sores."]}];
+
+  const CATEGORY_ORDER = ["Whole Body / Systemic", "Skin", "Stomach / Intestines", "Muscular / Neurological", "Vision / Eyes", "Maternal / Bleeding"];
+
+  const URGENCY_RANK = {
+    "Resuscitation (Immediate)": 0,
+    "Emergency (Few Hours)": 1,
+    "Urgent (24-48 Hours)": 2,
+    "Semi-Urgent (1-2 Weeks)": 3,
+    "Non-Urgent (Routine Checks)": 4
+  };
+
+  const URGENCY_CLASS = {
+    "Resuscitation (Immediate)": "urgency-resuscitation",
+    "Emergency (Few Hours)": "urgency-emergency",
+    "Urgent (24-48 Hours)": "urgency-urgent",
+    "Semi-Urgent (1-2 Weeks)": "urgency-semi",
+    "Non-Urgent (Routine Checks)": "urgency-non"
+  };
+
+  let selectedCategories = new Set();
+  let selectedSymptoms = new Set();
+
+  const stepCategoryEl = document.getElementById("ntd-step-category");
+  const stepSymptomEl = document.getElementById("ntd-step-symptom");
+  const stepResultsEl = document.getElementById("ntd-step-results");
+
+  function showStep(step){
+    stepCategoryEl.style.display = step === "category" ? "" : "none";
+    stepSymptomEl.style.display = step === "symptom" ? "" : "none";
+    stepResultsEl.style.display = step === "results" ? "" : "none";
+    document.getElementById("ntd-root").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderCategoryStep(){
+    let html = `
+      <p class="step-label">Step 1 of 3</p>
+      <p class="step-instructions">Select every area that applies. You can select more than one, and tap again to deselect.</p>
+      <div class="chip-group" id="ntd-category-chips"></div>
+      <div class="actions">
+        <button class="btn primary" id="ntd-to-symptoms" disabled>Next: choose symptoms</button>
+      </div>
+    `;
+    stepCategoryEl.innerHTML = html;
+
+    const chipGroup = document.getElementById("ntd-category-chips");
+    CATEGORY_ORDER.forEach(cat => {
+      const chip = document.createElement("button");
+      chip.className = "chip";
+      chip.textContent = cat;
+      chip.addEventListener("click", () => {
+        if(selectedCategories.has(cat)){
+          selectedCategories.delete(cat);
+          chip.classList.remove("selected");
+        } else {
+          selectedCategories.add(cat);
+          chip.classList.add("selected");
+        }
+        document.getElementById("ntd-to-symptoms").disabled = selectedCategories.size === 0;
+      });
+      chipGroup.appendChild(chip);
+    });
+
+    document.getElementById("ntd-to-symptoms").addEventListener("click", () => {
+      renderSymptomStep();
+      showStep("symptom");
+    });
+  }
+
+  function renderSymptomStep(){
+    let html = `
+      <p class="step-label">Step 2 of 3</p>
+      <p class="step-instructions">Select every symptom that applies. Tap again to deselect.</p>
+    `;
+
+    CATEGORY_ORDER.filter(c => selectedCategories.has(c)).forEach(cat => {
+      html += `
+        <div class="symptom-group">
+          <p class="symptom-group-title">${cat}</p>
+          <div class="chip-group" data-category="${cat}"></div>
+        </div>
+      `;
+    });
+
+    html += `
+      <div class="actions">
+        <button class="btn" id="ntd-back-to-categories">Back</button>
+        <button class="btn primary" id="ntd-to-results" disabled>See results</button>
+      </div>
+    `;
+
+    stepSymptomEl.innerHTML = html;
+
+    CATEGORY_ORDER.filter(c => selectedCategories.has(c)).forEach(cat => {
+      const group = stepSymptomEl.querySelector(`.chip-group[data-category="${CSS.escape(cat)}"]`);
+      (TAXONOMY[cat] || []).forEach(sym => {
+        const chip = document.createElement("button");
+        chip.className = "chip";
+        if(selectedSymptoms.has(sym)) chip.classList.add("selected");
+        chip.textContent = sym;
+        chip.addEventListener("click", () => {
+          if(selectedSymptoms.has(sym)){
+            selectedSymptoms.delete(sym);
+            chip.classList.remove("selected");
+          } else {
+            selectedSymptoms.add(sym);
+            chip.classList.add("selected");
+          }
+          document.getElementById("ntd-to-results").disabled = selectedSymptoms.size === 0;
+        });
+        group.appendChild(chip);
+      });
+    });
+
+    document.getElementById("ntd-to-results").disabled = selectedSymptoms.size === 0;
+
+    document.getElementById("ntd-back-to-categories").addEventListener("click", () => {
+      showStep("category");
+    });
+
+    document.getElementById("ntd-to-results").addEventListener("click", () => {
+      renderResultsStep();
+      showStep("results");
+    });
+  }
+
+  function paragraphsHtml(paragraphs){
+    return paragraphs.map(p => `<p>${escapeHtml(p)}</p>`).join("");
+  }
+
+  function listHtml(items){
+    return `<ul>${items.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ul>`;
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function renderResultsStep(){
+    const matches = RECORDS.map(r => {
+      const matchCount = r.symptoms.filter(s => selectedSymptoms.has(s)).length;
+      return { record: r, matchCount };
+    }).filter(m => m.matchCount > 0);
+
+    matches.sort((a, b) => {
+      if(b.matchCount !== a.matchCount) return b.matchCount - a.matchCount;
+      const rankA = URGENCY_RANK[a.record.urgency] ?? 99;
+      const rankB = URGENCY_RANK[b.record.urgency] ?? 99;
+      if(rankA !== rankB) return rankA - rankB;
+      return a.record.name.localeCompare(b.record.name);
+    });
+
+    let html = `
+      <p class="step-label">Step 3 of 3</p>
+      <p class="results-summary">${matches.length} possible match${matches.length === 1 ? "" : "es"} based on ${selectedSymptoms.size} selected symptom${selectedSymptoms.size === 1 ? "" : "s"}, sorted by closest match and urgency.</p>
+    `;
+
+    if(matches.length === 0){
+      html += `<div class="no-results">No conditions in this list matched your selected symptoms. This doesn't rule anything out — if you're concerned, please check with a health worker or doctor.</div>`;
+    } else {
+      matches.forEach(m => {
+        const r = m.record;
+        const urgencyClass = URGENCY_CLASS[r.urgency] || "urgency-non";
+        const matchedNames = r.symptoms.filter(s => selectedSymptoms.has(s));
+        html += `
+          <div class="result-card">
+            <div class="result-head">
+              <p class="result-name">${escapeHtml(r.name)}</p>
+              <span class="urgency-pill ${urgencyClass}">${escapeHtml(r.urgency)}</span>
+            </div>
+            <p class="match-tag">Matches ${m.matchCount} of ${r.symptoms.length} listed symptoms: ${matchedNames.map(escapeHtml).join(", ")}</p>
+
+            <details>
+              <summary>What is it?</summary>
+              <div class="section-body">${paragraphsHtml(r.whatIsIt)}</div>
+            </details>
+
+            <details>
+              <summary>Do I have it?</summary>
+              <div class="section-body">${listHtml(r.doIHaveIt)}</div>
+            </details>
+
+            <details>
+              <summary>What should I do?</summary>
+              <div class="section-body">${listHtml(r.whatShouldIDo)}</div>
+            </details>
+
+            <details>
+              <summary>When to see a doctor?</summary>
+              <div class="section-body">${paragraphsHtml(r.whenToSeeDoctor)}</div>
+            </details>
+
+            <details>
+              <summary>Prevention</summary>
+              <div class="section-body">${listHtml(r.prevention)}</div>
+            </details>
+          </div>
+        `;
+      });
+    }
+
+    html += `
+      <div class="actions">
+        <button class="btn" id="ntd-back-to-symptoms">Back</button>
+        <button class="btn" id="ntd-start-over">Start over</button>
+        <span class="save-note" id="ntd-save-note"></span>
+      </div>
+    `;
+
+    stepResultsEl.innerHTML = html;
+
+    document.getElementById("ntd-back-to-symptoms").addEventListener("click", () => {
+      renderSymptomStep();
+      showStep("symptom");
+    });
+
+    document.getElementById("ntd-start-over").addEventListener("click", resetAll);
+
+    saveToDatabase(matches);
+  }
+
+  const NTD_QUEUE_KEY = "ntd_pending_selfchecks";
+
+  // Reads whatever the app currently believes about connectivity.
+  // Falls back to the standard browser API when running outside the
+  // Nachocode-wrapped app (e.g. previewing the Bubble page in a browser).
+  function isOnline(){
+    if(window.Nachocode && typeof Nachocode.device !== "undefined" && typeof window.__ntdIsConnected === "boolean"){
+      return window.__ntdIsConnected;
+    }
+    return navigator.onLine;
+  }
+
+  // Nachocode fires 'networkchanged' with { isConnected, connectionType }.
+  // We track it in a plain variable since there's no synchronous getter.
+  if(window.Nachocode && Nachocode.event){
+    Nachocode.event.on("networkchanged", status => {
+      window.__ntdIsConnected = !!status.isConnected;
+      if(window.__ntdIsConnected) flushNtdQueue();
+    });
+    Nachocode.event.on("foreground", () => flushNtdQueue());
+    Nachocode.event.on("init", () => flushNtdQueue());
+  }
+
+  function readQueue(callback){
+    if(window.Nachocode && Nachocode.preference){
+      Nachocode.preference.getData(NTD_QUEUE_KEY, data => {
+        try{ callback(data ? JSON.parse(data) : []); }
+        catch(e){ callback([]); }
+      });
+    } else {
+      try{ callback(JSON.parse(localStorage.getItem(NTD_QUEUE_KEY) || "[]")); }
+      catch(e){ callback([]); }
+    }
+  }
+
+  function writeQueue(queue){
+    const json = JSON.stringify(queue);
+    if(window.Nachocode && Nachocode.preference){
+      Nachocode.preference.setData(NTD_QUEUE_KEY, json);
+    } else {
+      localStorage.setItem(NTD_QUEUE_KEY, json);
+    }
+  }
+
+  function sendOne(payload){
+    if(!isOnline()) return false;
+    if(typeof bubble_fn_saveNtdSelfCheck !== "function") return false;
+    try{
+      bubble_fn_saveNtdSelfCheck(JSON.stringify(payload));
+      return true;
+    } catch(err){
+      return false;
+    }
+  }
+
+  function flushNtdQueue(){
+    readQueue(queue => {
+      if(!queue.length) return;
+      const remaining = queue.filter(item => !sendOne(item));
+      writeQueue(remaining);
+    });
+  }
+
+  function saveToDatabase(matches){
+    const payload = {
+      categories: Array.from(selectedCategories),
+      symptoms: Array.from(selectedSymptoms),
+      matches: matches.map(m => ({ name: m.record.name, urgency: m.record.urgency, matchCount: m.matchCount })),
+      timestamp: new Date().toISOString()
+    };
+
+    const noteEl = document.getElementById("ntd-save-note");
+
+    // Hook point: this calls into Bubble via the Toolbox plugin's
+    // bubble_fn_ bridge. Define bubble_fn_saveNtdSelfCheck in a Bubble
+    // workflow ("An external JavaScript action is called") to receive
+    // this payload and create a database record from it.
+    if(sendOne(payload)){
+      if(noteEl) noteEl.textContent = "Saved.";
+      flushNtdQueue(); // also clear out anything left over from a prior offline session
+    } else {
+      readQueue(queue => {
+        queue.push(payload);
+        writeQueue(queue);
+        if(noteEl) noteEl.textContent = "Saved locally — will sync when you're back online.";
+      });
+    }
+  }
+
+  function resetAll(){
+    selectedCategories = new Set();
+    selectedSymptoms = new Set();
+    renderCategoryStep();
+    showStep("category");
+  }
+
+  renderCategoryStep();
+  showStep("category");
+  flushNtdQueue();
+})();
+</script>
+
+<script src="./register-sw.js"></script>
+</body>
+</html>

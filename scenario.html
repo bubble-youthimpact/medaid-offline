@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scenario Practice</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="theme-color" content="#156569">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MEDAID">
+<style>
+  .mck-back-nav{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size:13px;
+    color:#63605A;
+    text-decoration:none;
+    padding: 16px 16px 0;
+  }
+</style>
+</head>
+<body>
+<a class="mck-back-nav" href="./index.html">&larr; Back to Home</a>
+<link rel="stylesheet" href="./fonts/fonts.css">
+
+<style>
+  /* Everything is scoped under .scw-widget so this can never restyle
+     the host page — Bubble's HTML element is not sandboxed, and a
+     <style> tag applies document-wide regardless of where it sits in
+     the DOM, so bare `body`, `html`, or `*` selectors would leak out. */
+
+  .scw-widget, .scw-widget *{
+    box-sizing: border-box;
+  }
+
+  .scw-widget{
+    --paper: #F6F4EE;
+    --card: #FFFFFF;
+    --ink: #2B2A28;
+    --ink-soft: #63605A;
+    --sage: #5D7F63;
+    --sage-soft: #E4EBE2;
+    --clay: #B5654F;
+    --clay-soft: #F3E4DF;
+    --line: #DEDAD0;
+    --radius: 14px;
+
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    padding: 24px 16px 40px;
+  }
+
+  .scw-widget .eyebrow{
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 4px;
+  }
+
+  .scw-widget h1{
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    line-height: 1.25;
+  }
+
+  .scw-widget .scenario-box{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    color: var(--ink);
+  }
+
+  .scw-widget .scenario-box p{ margin: 0 0 12px; }
+  .scw-widget .scenario-box p:last-child{ margin-bottom: 0; }
+
+  .scw-widget .round-label{
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    color: var(--ink-soft);
+    margin: 28px 0 10px;
+  }
+
+  .scw-widget .dialogue{
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    width: 100%;
+  }
+
+  .scw-widget .dialogue:last-of-type{ margin-bottom: 22px; }
+
+  .scw-widget .dialogue.friend{
+    background: var(--sage-soft);
+    border-top-left-radius: 4px;
+  }
+
+  .scw-widget .dialogue.you{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-top-right-radius: 4px;
+  }
+
+  .scw-widget .dialogue .speaker{
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--sage);
+    margin-bottom: 6px;
+  }
+
+  .scw-widget .dialogue.you .speaker{ color: var(--ink-soft); }
+
+  .scw-widget .prompt{
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+  }
+
+  .scw-widget .options{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .scw-widget .option-btn{
+    text-align: left;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 15px;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .scw-widget .option-btn:focus-visible{
+    outline: 2px solid var(--sage);
+    outline-offset: 2px;
+  }
+
+  .scw-widget .option-btn:disabled{
+    cursor: default;
+    opacity: 0.45;
+  }
+
+  .scw-widget .option-btn.chosen-correct{
+    border-color: var(--sage);
+    background: var(--sage-soft);
+    opacity: 1;
+  }
+
+  .scw-widget .option-btn.chosen-incorrect{
+    border-color: var(--clay);
+    background: var(--clay-soft);
+    opacity: 1;
+  }
+
+  .scw-widget .option-letter{
+    display:inline-block;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+
+  .scw-widget .result{
+    margin-top: 18px;
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    animation: scw-rise 0.25s ease;
+  }
+
+  @keyframes scw-rise{
+    from{ opacity: 0; transform: translateY(6px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  .scw-widget .result.correct{
+    background: var(--sage-soft);
+    border-color: var(--sage);
+  }
+
+  .scw-widget .result.incorrect{
+    background: var(--clay-soft);
+    border-color: var(--clay);
+  }
+
+  .scw-widget .result-tag{
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  .scw-widget .result-tag.correct{ color: var(--sage); }
+  .scw-widget .result-tag.incorrect{ color: var(--clay); }
+
+  .scw-widget .result .speaker{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+
+  .scw-widget .result .reaction{
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    margin: 0 0 14px;
+  }
+
+  .scw-widget .result .behind{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .scw-widget .behind strong{
+    display:block;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .scw-widget .actions{
+    margin-top: 18px;
+    display:flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .scw-widget .btn,
+  .scw-widget .btn:hover,
+  .scw-widget .btn:focus,
+  .scw-widget .btn:active,
+  .scw-widget .btn:visited{
+    font-family: inherit !important;
+    font-size: 14px !important;
+    border-radius: 10px !important;
+    padding: 10px 16px !important;
+    cursor: pointer !important;
+    border: 1px solid var(--line) !important;
+    background: var(--card) !important;
+    background-color: var(--card) !important;
+    color: var(--ink) !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: none !important;
+  }
+
+  .scw-widget .btn.primary,
+  .scw-widget .btn.primary:hover,
+  .scw-widget .btn.primary:focus,
+  .scw-widget .btn.primary:active,
+  .scw-widget .btn.primary:visited{
+    background: #A59AE2 !important;
+    background-color: #A59AE2 !important;
+    border-color: #A59AE2 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .scw-widget .result{ animation: none; }
+  }
+</style>
+
+<div class="scw-widget">
+  <p class="eyebrow" id="scw-eyebrow">Scenario 1</p>
+  <h1 id="scw-title">The Overachiever</h1>
+
+  <div class="scenario-box" id="scw-intro"></div>
+
+  <p class="round-label" id="scw-round-label">Round 1 — Approaching the Mask</p>
+
+  <div id="scw-dialogue-slot"></div>
+
+  <p class="prompt" id="scw-prompt">What do you say?</p>
+
+  <div class="options" id="scw-options"></div>
+
+  <div id="scw-result-slot"></div>
+</div>
+
+<script>
+(function(){
+  const scenarios = [
+    {
+      eyebrow: "Scenario 1",
+      title: "The Overachiever",
+      intro: [
+        "Your friend Ji-woo is an absolute machine. She runs two student clubs, plays varsity soccer, maintains top grades, and always posts her life on social media. But over the past few weeks, you've noticed subtle changes: she's living on energy drinks, making suicidal jokes, and today, after getting a minor correction on a presentation from a teacher, she ran into an empty hallway and had a quiet, hyperventilating panic attack.",
+        "You find her sitting on the stairs behind the auditorium, rapidly wiping her eyes and trying to fix her hair before anyone sees her."
+      ],
+      roundLabel: "Round 1 — Approaching the Mask",
+      turns: [
+        {
+          speaker: "Ji-woo",
+          variant: "friend",
+          text: "(Instantly sitting up straight, putting on a bright smile) \"Oh, hey! I was just checking my phone. Don't worry, I'm completely fine! Just a bit stressed about the presentation, but I've got it all under control. Ready for the next class!\""
+        }
+      ],
+      prompt: "What do you say?",
+      friendName: "Ji-woo",
+      options: [
+        {
+          id: "A",
+          text: "Ji-woo, stop saying you're fine. You literally just had a panic attack over a two-minute presentation fix. Everyone is starting to notice how burned out you look.",
+          correct: false,
+          trap: "Public Exposure Trap",
+          reaction: "(Her smile turns cold, and she stands up immediately) \"I'm not having a panic attack, I was just tired. And I don't care if everyone is talking about me. I have things to do.\"",
+          behind: "High-functioning individuals rely on their public competence as armor. Bluntly calling them out with phrases like \u201cEveryone is noticing\u201d or \u201cStop lying\u201d feels like you're stripping away their safety net, forcing them to build an even taller wall to protect their pride."
+        },
+        {
+          id: "B",
+          text: "Hey, take a breath. You don't have to put on a smile for me right now. It looks like you're under a lot of pressure, and it's completely okay if you feel exhausted.",
+          correct: true,
+          reaction: "(Her smile disappears. She lowers her head into her hands, her shoulders dropping) \"...I feel like if I stop moving for even five minutes, everything I've built is just going to crumble and everyone will see I'm a fraud.\"",
+          behind: "The most exhausting part of high-functioning depression is the constant performance. By explicitly giving her permission to not be okay without threatening her dignity or judging her ability, you remove the need for her armor."
+        },
+        {
+          id: "C",
+          text: "You work way too hard! Why don't you just drop one of your clubs or ask the teacher for an extension? You're doing this to yourself at this point.",
+          correct: false,
+          trap: "Logistical Invalidation",
+          reaction: "*sighs, frustrated* \"I can't just drop a club. People are depending on me, and it goes on my college apps. You don't get it.\"",
+          behind: "Telling an overachiever to \u201cjust drop things\u201d ignores the deep-seated anxiety and worth-issues driving their perfectionism. It makes your advice feel unrealistic and out-of-touch, causing them to write off your help entirely."
+        }
+      ]
+    },
+    {
+      eyebrow: "Scenario 2",
+      title: "The Midnight Gaming Channel",
+      intro: [
+        "Your friend Alex is usually the loud, funny core of your online gaming group. For the past month, though, he's been completely absent from Discord. When he does log on, it's at 3:30 AM on a school/work night. He plays silently in a solo lobby, ignores main server invites, and his status is set to \"Invisible.\"",
+        "You notice he's currently online alone in a private voice room at 3:00 AM. You jump into the channel."
+      ],
+      roundLabel: "Round 1 — Breaking Through the Silence",
+      turns: [
+        { speaker: "You", variant: "you", text: "\"Yo Alex, up late?\"" },
+        {
+          speaker: "Alex",
+          variant: "friend",
+          text: "(Long silence... sighs quietly into his mic) \"Oh, hey. Yeah, just couldn't sleep again. My brain wouldn't turn off. Sorry I haven't joined the main group lately, man. I've been feeling like I'm a burden and didn't want to bring down the vibe for everyone else.\""
+        }
+      ],
+      prompt: "What do you reply?",
+      friendName: "Alex",
+      options: [
+        {
+          id: "A",
+          text: "Dude, you're not useless at all! We literally miss you so much. You just need to fix your sleep schedule! Hop off the game, take some melatonin, and force yourself to sleep. You'll feel 100x better tomorrow, trust me.",
+          correct: false,
+          trap: "Band-Aid Solution Trap",
+          reaction: "\"Yeah... true. I guess I'll try that. Night.\" (Disconnects)",
+          behind: "When someone is experiencing chronic insomnia driven by emotional distress, giving quick surface-level advice like \u201cjust sleep\u201d or \u201ctake melatonin\u201d feels invalidating. It treats a deep emotional crisis like a simple sleep-hygiene mistake."
+        },
+        {
+          id: "B",
+          text: "You're definitely not bringing down the vibe, but ghosting us for a month without saying anything is actually kind of messed up. We were actually worried something happened to you.",
+          correct: false,
+          trap: "Guilt Trip",
+          reaction: "(A quiet, heavy sigh) \"Yeah... I know. I'm a terrible friend. I'll just hop off so you guys don't have to deal with me.\" (Alex left the voice channel)",
+          behind: "Depression constantly whispers to the sufferer that they are a nuisance and a burden to their friends. Expressing frustration or guilt over their absence\u2014even out of real concern\u2014validates that toxic inner voice and pushes them into deeper isolation."
+        },
+        {
+          id: "C",
+          text: "You don't have to worry about 'bringing down the vibe' with me. Honestly, it sounds like things have been really heavy for you lately. I'll just chill in the lobby with you, we don't even have to talk if you don't feel like it.",
+          correct: true,
+          reaction: "(Silence for a few seconds, then a faint chuckle) \"Thanks, man... I appreciate that. Honestly, just staying in the voice call while we play silently would be really nice.\"",
+          behind: "You validated his presence without forcing him to entertain you, fix his emotions, or explain his depression. This zero-pressure environment is exactly what lowers the brain's defense mechanisms."
+        }
+      ]
+    }
+  ];
+
+  let scenarioIndex = 0;
+  let answered = false;
+
+  const eyebrowEl = document.getElementById("scw-eyebrow");
+  const titleEl = document.getElementById("scw-title");
+  const introEl = document.getElementById("scw-intro");
+  const roundLabelEl = document.getElementById("scw-round-label");
+  const dialogueSlot = document.getElementById("scw-dialogue-slot");
+  const promptEl = document.getElementById("scw-prompt");
+  const optionsEl = document.getElementById("scw-options");
+  const resultSlot = document.getElementById("scw-result-slot");
+
+  function renderScenario(){
+    const s = scenarios[scenarioIndex];
+    answered = false;
+
+    eyebrowEl.textContent = s.eyebrow;
+    titleEl.textContent = s.title;
+    introEl.innerHTML = s.intro.map(p => `<p>${p}</p>`).join("");
+    roundLabelEl.textContent = s.roundLabel;
+    promptEl.textContent = s.prompt;
+
+    dialogueSlot.innerHTML = s.turns.map(t => `
+      <div class="dialogue ${t.variant}">
+        <div class="speaker">${t.speaker}</div>
+        <div>${t.text}</div>
+      </div>
+    `).join("");
+
+    resultSlot.innerHTML = "";
+    renderOptions();
+
+    titleEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderOptions(){
+    const s = scenarios[scenarioIndex];
+    optionsEl.innerHTML = "";
+    s.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.setAttribute("data-id", opt.id);
+      btn.innerHTML = `<span class="option-letter">${opt.id}.</span>${opt.text}`;
+      btn.addEventListener("click", () => selectOption(opt, btn));
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function selectOption(opt, btnEl){
+    if(answered) return;
+    answered = true;
+
+    const s = scenarios[scenarioIndex];
+    document.querySelectorAll(".scw-widget .option-btn").forEach(b => b.disabled = true);
+    btnEl.classList.add(opt.correct ? "chosen-correct" : "chosen-incorrect");
+
+    const tagText = opt.correct
+      ? "\u2B50 Correct choice"
+      : `\u274C Trap triggered: ${opt.trap}`;
+
+    const isLastScenario = scenarioIndex === scenarios.length - 1;
+    let actionsHtml = `<button class="btn" id="scw-retry-btn">Try a different response</button>`;
+    if(opt.correct && !isLastScenario){
+      actionsHtml += `<button class="btn primary" id="scw-continue-btn">Continue to Round ${scenarioIndex + 2}</button>`;
+    } else if(opt.correct && isLastScenario){
+      actionsHtml = `<p style="color:var(--ink-soft); font-size:14px; margin-top:4px;">You've completed all rounds.</p>`;
+    }
+
+    resultSlot.innerHTML = `
+      <div class="result ${opt.correct ? "correct" : "incorrect"}">
+        <div class="result-tag ${opt.correct ? "correct" : "incorrect"}">${tagText}</div>
+        <div class="speaker">${s.friendName}'s reaction</div>
+        <p class="reaction">${opt.reaction}</p>
+        <div class="behind">
+          <strong>Behind the scenes</strong>
+          ${opt.behind}
+        </div>
+      </div>
+      <div class="actions">${actionsHtml}</div>
+    `;
+
+    const retryBtn = document.getElementById("scw-retry-btn");
+    if(retryBtn) retryBtn.addEventListener("click", resetRound);
+
+    const continueBtn = document.getElementById("scw-continue-btn");
+    if(continueBtn){
+      continueBtn.addEventListener("click", () => {
+        scenarioIndex += 1;
+        renderScenario();
+      });
+    }
+  }
+
+  function resetRound(){
+    answered = false;
+    resultSlot.innerHTML = "";
+    renderOptions();
+  }
+
+  renderScenario();
+})();
+</script>
+
+<script src="./register-sw.js"></script>
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sort the Response</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="theme-color" content="#156569">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MEDAID">
+<style>
+  .mck-back-nav{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size:13px;
+    color:#63605A;
+    text-decoration:none;
+    padding: 16px 16px 0;
+  }
+</style>
+</head>
+<body>
+<a class="mck-back-nav" href="./index.html">&larr; Back to Home</a>
+<link rel="stylesheet" href="./fonts/fonts.css">
+
+<style>
+  /* Everything is scoped under .shg-widget so this can never restyle
+     the host page — Bubble's HTML element is not sandboxed, and a
+     <style> tag applies document-wide regardless of where it sits in
+     the DOM, so bare `body`, `html`, or `*` selectors would leak out. */
+
+  .shg-widget, .shg-widget *{
+    box-sizing: border-box;
+  }
+
+  .shg-widget{
+    --paper: #F6F4EE;
+    --card: #FFFFFF;
+    --ink: #2B2A28;
+    --ink-soft: #63605A;
+    --sage: #5D7F63;
+    --sage-soft: #E4EBE2;
+    --clay: #B5654F;
+    --clay-soft: #F3E4DF;
+    --line: #DEDAD0;
+    --radius: 14px;
+
+    display: block;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    padding: 24px 16px 40px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .shg-widget .eyebrow{
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 4px;
+  }
+
+  .shg-widget h1{
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    line-height: 1.25;
+  }
+
+  .shg-widget .instructions{
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin: 0 0 22px;
+  }
+
+  .shg-widget .progress{
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+  }
+
+  .shg-widget .zones{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 600px){
+    .shg-widget .zones{ grid-template-columns: 1fr; }
+  }
+
+  .shg-widget .zone{
+    border: 2px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 14px;
+    min-height: 160px;
+    background: var(--card);
+    transition: border-color 0.12s ease, background 0.12s ease;
+  }
+
+  .shg-widget .zone.drag-over{
+    border-style: solid;
+  }
+
+  .shg-widget .zone.pressure{ border-color: var(--clay); }
+  .shg-widget .zone.pressure.drag-over{ background: var(--clay-soft); }
+
+  .shg-widget .zone.harbor{ border-color: var(--sage); }
+  .shg-widget .zone.harbor.drag-over{ background: var(--sage-soft); }
+
+  .shg-widget .zone-title{
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0 0 10px;
+    display:flex;
+    align-items:center;
+    gap: 6px;
+  }
+
+  .shg-widget .zone.pressure .zone-title{ color: var(--clay); }
+  .shg-widget .zone.harbor .zone-title{ color: var(--sage); }
+
+  .shg-widget .zone-body{
+    display:flex;
+    flex-direction:column;
+    gap: 8px;
+    min-height: 60px;
+  }
+
+  .shg-widget .pool-label{
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 10px;
+  }
+
+  .shg-widget .pool{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    min-height: 70px;
+  }
+
+  .shg-widget .quote-card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--ink);
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    max-width: 100%;
+  }
+
+  .shg-widget .pool .quote-card{
+    width: calc(50% - 5px);
+  }
+
+  @media (max-width: 480px){
+    .shg-widget .pool .quote-card{ width: 100%; }
+  }
+
+  .shg-widget .quote-card.dragging{
+    opacity: 0.35;
+  }
+
+  .shg-widget .quote-card.placed{
+    cursor: default;
+    width: 100%;
+  }
+
+  .shg-widget .quote-card.correct{
+    border-color: var(--sage);
+    background: var(--sage-soft);
+  }
+
+  .shg-widget .quote-card.incorrect{
+    border-color: var(--clay);
+    background: var(--clay-soft);
+  }
+
+  .shg-widget .quote-text{
+    margin: 0;
+  }
+
+  .shg-widget .card-tag{
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .shg-widget .quote-card.correct .card-tag{ color: var(--sage); }
+  .shg-widget .quote-card.incorrect .card-tag{ color: var(--clay); }
+
+  .shg-widget .card-why{
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 8px 0 0;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .shg-widget .card-why strong{
+    display:block;
+    font-size: 12px;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .shg-drag-ghost{
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    pointer-events: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+  }
+
+  .shg-widget .actions{
+    margin-top: 20px;
+    display:flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .shg-widget .btn,
+  .shg-widget .btn:hover,
+  .shg-widget .btn:focus,
+  .shg-widget .btn:active,
+  .shg-widget .btn:visited{
+    font-family: inherit !important;
+    font-size: 14px !important;
+    border-radius: 10px !important;
+    padding: 10px 16px !important;
+    cursor: pointer !important;
+    border: 1px solid var(--line) !important;
+    background: var(--card) !important;
+    background-color: var(--card) !important;
+    color: var(--ink) !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: none !important;
+  }
+
+  .shg-widget .btn.primary,
+  .shg-widget .btn.primary:hover,
+  .shg-widget .btn.primary:focus,
+  .shg-widget .btn.primary:active,
+  .shg-widget .btn.primary:visited{
+    background: #A59AE2 !important;
+    background-color: #A59AE2 !important;
+    border-color: #A59AE2 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .shg-widget .complete-msg{
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+</style>
+
+<div class="shg-widget">
+  <p class="eyebrow">Sorting Exercise</p>
+  <h1>Safe Harbor vs. Heavy Pressure</h1>
+  <p class="instructions">Drag each quote into the category it belongs to. Once placed, you'll see whether it's a supportive response or a pressuring one, and why.</p>
+  <p class="progress" id="shg-progress">0 of 8 sorted</p>
+
+  <div class="zones">
+    <div class="zone pressure" id="shg-zone-pressure" data-category="pressure">
+      <p class="zone-title">🛑 Heavy Pressure</p>
+      <div class="zone-body" id="shg-zone-pressure-body"></div>
+    </div>
+    <div class="zone harbor" id="shg-zone-harbor" data-category="harbor">
+      <p class="zone-title">🟢 Safe Harbor</p>
+      <div class="zone-body" id="shg-zone-harbor-body"></div>
+    </div>
+  </div>
+
+  <p class="pool-label">Quotes to sort</p>
+  <div class="pool" id="shg-pool"></div>
+
+  <div class="actions">
+    <button class="btn" id="shg-reset-btn">Reset</button>
+    <span class="complete-msg" id="shg-complete-msg"></span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const quotes = [
+    {
+      id: "q1",
+      text: "\"You have so much to be grateful for—look on the bright side!\"",
+      category: "pressure",
+      why: "This is a classic example of toxic positivity. Depression isn't an attitude problem or ungratefulness; it's a physiological and cognitive state. Reminding someone of their \u201cgood life\u201d only adds a heavy layer of guilt on top of their pain."
+    },
+    {
+      id: "q2",
+      text: "\"Lying in bed all day is only going to make you feel worse. You need to start exercising!\"",
+      category: "pressure",
+      why: "When the nervous system is completely depleted, even standing up can feel like carrying a lead backpack. Framing physical exertion as an easy choice makes them feel judged, misunderstood, and inadequate."
+    },
+    {
+      id: "q3",
+      text: "\"Why are you feeling like this? Did something specific happen?\"",
+      category: "pressure",
+      why: "Clinical depression often arrives without a clear, logical trigger. Asking \u201cWhy?\u201d forces the person into an accidental interrogation, leaving them feeling broken because they can't give you a rational answer."
+    },
+    {
+      id: "q4",
+      text: "\"Everyone goes through tough times. You just have to push through it like the rest of us.\"",
+      category: "pressure",
+      why: "This minimizes clinical depression down to everyday stress. It tells the person that their inability to function is simply a lack of personal grit or willpower compared to others."
+    },
+    {
+      id: "q5",
+      text: "\"No pressure to reply to this right now, but I dropped some food at your door.\"",
+      category: "harbor",
+      why: "This removes all logistical friction. It meets a basic physical need (eating) while giving them explicit permission not to spend energy hosting, chatting, or feeling guilty for being slow to text back."
+    },
+    {
+      id: "q6",
+      text: "\"It makes total sense why you feel completely exhausted. You don't have to apologize for it.\"",
+      category: "harbor",
+      why: "This offers validation without demands. It confirms that their feelings are understandable and removes the \u201cperformance tax\u201d of pretending to be okay when they are around you."
+    },
+    {
+      id: "q7",
+      text: "\"I'm not going anywhere, even if you don't have the energy to talk. We can just sit here in silence.\"",
+      category: "harbor",
+      why: "This builds a zero-pressure environment. It combats the terrifying core belief of depression that you are a burden to everyone by proving your support is unconditional."
+    },
+    {
+      id: "q8",
+      text: "\"You've seemed really wiped out lately, so I just wanted to check in. How are you doing?\"",
+      category: "harbor",
+      why: "It leads with specific, gentle observations rather than clinical labels or heavy accusations. It opens a door for them to unmask without feeling exposed."
+    }
+  ];
+
+  const pool = document.getElementById("shg-pool");
+  const zonePressureBody = document.getElementById("shg-zone-pressure-body");
+  const zoneHarborBody = document.getElementById("shg-zone-harbor-body");
+  const progressEl = document.getElementById("shg-progress");
+  const completeMsgEl = document.getElementById("shg-complete-msg");
+  const resetBtn = document.getElementById("shg-reset-btn");
+
+  let placedCount = 0;
+  let correctCount = 0;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function buildPool(){
+    pool.innerHTML = "";
+    zonePressureBody.innerHTML = "";
+    zoneHarborBody.innerHTML = "";
+    placedCount = 0;
+    correctCount = 0;
+    updateProgress();
+    completeMsgEl.textContent = "";
+
+    shuffle(quotes).forEach(q => {
+      const card = document.createElement("div");
+      card.className = "quote-card";
+      card.setAttribute("data-id", q.id);
+      card.innerHTML = `<p class="quote-text">${q.text}</p>`;
+      attachDrag(card, q);
+      pool.appendChild(card);
+    });
+  }
+
+  function updateProgress(){
+    progressEl.textContent = `${placedCount} of ${quotes.length} sorted`;
+    if(placedCount === quotes.length){
+      completeMsgEl.textContent = `Done — ${correctCount} of ${quotes.length} placed correctly.`;
+    }
+  }
+
+  function placeCard(card, q, targetZone){
+    const isCorrect = q.category === targetZone;
+    card.classList.remove("dragging");
+    card.classList.add("placed", isCorrect ? "correct" : "incorrect");
+    card.style.cursor = "default";
+    card.style.width = "100%";
+
+    const tag = isCorrect ? "\u2705 Correct category" : "\u26A0\uFE0F Not quite the right category";
+    card.innerHTML = `
+      <div class="card-tag">${tag}</div>
+      <p class="quote-text">${q.text}</p>
+      <div class="card-why">
+        <strong>Why</strong>
+        ${q.why}
+      </div>
+    `;
+
+    const targetBody = targetZone === "pressure" ? zonePressureBody : zoneHarborBody;
+    targetBody.appendChild(card);
+
+    placedCount += 1;
+    if(isCorrect) correctCount += 1;
+    updateProgress();
+  }
+
+  function attachDrag(card, q){
+    let ghost = null;
+    let offsetX = 0, offsetY = 0;
+    let dragging = false;
+
+    card.addEventListener("pointerdown", (e) => {
+      if(card.classList.contains("placed")) return;
+      dragging = true;
+
+      const rect = card.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+
+      ghost = card.cloneNode(true);
+      ghost.classList.add("shg-drag-ghost");
+      ghost.style.width = rect.width + "px";
+      ghost.style.left = rect.left + "px";
+      ghost.style.top = rect.top + "px";
+      document.body.appendChild(ghost);
+
+      card.classList.add("dragging");
+      card.setPointerCapture(e.pointerId);
+    });
+
+    card.addEventListener("pointermove", (e) => {
+      if(!dragging || !ghost) return;
+      ghost.style.left = (e.clientX - offsetX) + "px";
+      ghost.style.top = (e.clientY - offsetY) + "px";
+
+      document.querySelectorAll(".shg-widget .zone").forEach(z => z.classList.remove("drag-over"));
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      const zoneUnder = under ? under.closest(".shg-widget .zone") : null;
+      if(zoneUnder) zoneUnder.classList.add("drag-over");
+    });
+
+    function endDrag(e){
+      if(!dragging) return;
+      dragging = false;
+
+      document.querySelectorAll(".shg-widget .zone").forEach(z => z.classList.remove("drag-over"));
+
+      if(ghost){
+        ghost.remove();
+        ghost = null;
+      }
+
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      const zoneUnder = under ? under.closest(".shg-widget .zone") : null;
+
+      if(zoneUnder){
+        const targetCategory = zoneUnder.getAttribute("data-category");
+        placeCard(card, q, targetCategory);
+      } else {
+        card.classList.remove("dragging");
+      }
+    }
+
+    card.addEventListener("pointerup", endDrag);
+    card.addEventListener("pointercancel", endDrag);
+  }
+
+  resetBtn.addEventListener("click", buildPool);
+
+  buildPool();
+})();
+</script>
+
+<script src="./register-sw.js"></script>
+</body>
+</html>
