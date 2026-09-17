@@ -277,7 +277,7 @@
   }
 </style>
 
-<div class="shg-widget">
+<div class="shg-widget" id="shg-root">
   <p class="eyebrow">Sorting Exercise</p>
   <h1>Safe Harbor vs. Heavy Pressure</h1>
   <p class="instructions">Drag each quote into the category it belongs to. Once placed, you'll see whether it's a supportive response or a pressuring one, and why.</p>
@@ -444,7 +444,7 @@
       ghost.style.width = rect.width + "px";
       ghost.style.left = rect.left + "px";
       ghost.style.top = rect.top + "px";
-      document.body.appendChild(ghost);
+      document.getElementById("shg-root").appendChild(ghost);
 
       card.classList.add("dragging");
       card.setPointerCapture(e.pointerId);
