@@ -1,6 +1,6 @@
 // Bump this version string any time you change any cached file.
 // It forces the service worker to re-cache everything on next load.
-const CACHE_VERSION = 'v11';
+const CACHE_VERSION = 'v13';
 const CACHE_NAME = `mck-offline-${CACHE_VERSION}`;
 
 // Every file the app needs to run with zero connection.

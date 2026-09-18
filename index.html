@@ -123,6 +123,132 @@
     margin-top: 28px;
     text-align: center;
   }
+
+  .install-instructions{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 20px;
+  }
+
+  .install-instructions-title{
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 10px;
+  }
+
+  .install-instructions-row{
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  .install-instructions-row:last-child{ margin-bottom: 0; }
+
+  .install-instructions-row strong{
+    flex: none;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .install-btn,
+  .install-btn:hover,
+  .install-btn:focus,
+  .install-btn:active,
+  .install-btn:visited{
+    display: none;
+    width: 100%;
+    font-family: inherit !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    padding: 13px 16px !important;
+    cursor: pointer !important;
+    border: none !important;
+    background: var(--teal) !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+    margin-bottom: 22px;
+  }
+
+  .install-btn.visible{ display: block; }
+
+  .ios-sheet{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(43,42,40,0.45);
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 999;
+  }
+
+  .ios-sheet.open{ display: flex; }
+
+  .ios-sheet-inner{
+    background: var(--card);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 20px 20px 0 0;
+    padding: 22px 20px 28px;
+  }
+
+  .ios-sheet-title{
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+
+  .ios-step{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .ios-step .num{
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--teal-soft);
+    color: var(--teal);
+    font-size: 12px;
+    font-weight: 700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .ios-sheet-close,
+  .ios-sheet-close:hover,
+  .ios-sheet-close:focus,
+  .ios-sheet-close:active{
+    width: 100%;
+    margin-top: 8px;
+    font-family: inherit !important;
+    font-size: 14px !important;
+    border-radius: 10px !important;
+    padding: 11px 16px !important;
+    cursor: pointer !important;
+    border: 1px solid var(--line) !important;
+    background: var(--card) !important;
+    color: var(--ink) !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
 </style>
 </head>
 <body>
@@ -131,10 +257,24 @@
     <h1>Self-Check &amp; Training Tools</h1>
     <p class="lede">Works fully offline once opened — no connection needed after your first visit.</p>
 
+    <div class="install-instructions">
+      <p class="install-instructions-title">How to install</p>
+      <div class="install-instructions-row">
+        <strong>iPhone:</strong>
+        <span>Browser settings &gt; Share &gt; More &gt; Add to Home Screen</span>
+      </div>
+      <div class="install-instructions-row">
+        <strong>Android:</strong>
+        <span>Browser settings &gt; Install / Add to Home Screen</span>
+      </div>
+    </div>
+
     <span class="status" id="status-pill">
       <span class="dot"></span>
       <span id="status-text">Checking connection…</span>
     </span>
+
+    <button class="install-btn" id="install-btn">Install App</button>
 
     <a class="card-link" href="./self-check-medaid.html">
       <p class="card-title">Symptom Self-Check</p>
@@ -163,6 +303,25 @@
     <p class="footnote">Add this page to your home screen for one-tap offline access.</p>
   </div>
 
+  <div class="ios-sheet" id="ios-sheet">
+    <div class="ios-sheet-inner">
+      <p class="ios-sheet-title">Install MEDAID on your iPhone</p>
+      <div class="ios-step">
+        <span class="num">1</span>
+        <span>Tap the Share icon in Safari's toolbar (the square with an arrow pointing up).</span>
+      </div>
+      <div class="ios-step">
+        <span class="num">2</span>
+        <span>Scroll down and tap "Add to Home Screen."</span>
+      </div>
+      <div class="ios-step">
+        <span class="num">3</span>
+        <span>Tap "Add" in the top right corner.</span>
+      </div>
+      <button class="ios-sheet-close" id="ios-sheet-close">Got it</button>
+    </div>
+  </div>
+
   <script src="./register-sw.js"></script>
   <script>
     function updateStatus(){
@@ -179,6 +338,60 @@
     window.addEventListener('online', updateStatus);
     window.addEventListener('offline', updateStatus);
     updateStatus();
+
+    // --- Install button logic ---
+    const installBtn = document.getElementById('install-btn');
+    const iosSheet = document.getElementById('ios-sheet');
+    const iosSheetClose = document.getElementById('ios-sheet-close');
+
+    function isStandalone(){
+      return window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true; // iOS Safari's own flag
+    }
+
+    function isIOS(){
+      return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    }
+
+    let deferredPrompt = null;
+
+    if(!isStandalone()){
+      if(isIOS()){
+        // iOS Safari has no install prompt API at all — show manual steps instead.
+        installBtn.textContent = 'Install App';
+        installBtn.classList.add('visible');
+      } else {
+        // Android/Chrome (and other Chromium browsers) fire this event when
+        // the browser itself has decided the site is installable.
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          installBtn.classList.add('visible');
+        });
+      }
+    }
+
+    installBtn.addEventListener('click', async () => {
+      if(isIOS()){
+        iosSheet.classList.add('open');
+        return;
+      }
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if(outcome === 'accepted'){
+        installBtn.classList.remove('visible');
+      }
+    });
+
+    iosSheetClose.addEventListener('click', () => {
+      iosSheet.classList.remove('open');
+    });
+
+    window.addEventListener('appinstalled', () => {
+      installBtn.classList.remove('visible');
+    });
   </script>
 </body>
 </html>
