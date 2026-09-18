@@ -405,11 +405,13 @@
   const stepSymptomEl = document.getElementById("mck-step-symptom");
   const stepResultsEl = document.getElementById("mck-step-results");
 
-  function showStep(step){
+  function showStep(step, skipScroll){
     stepCategoryEl.style.display = step === "category" ? "" : "none";
     stepSymptomEl.style.display = step === "symptom" ? "" : "none";
     stepResultsEl.style.display = step === "results" ? "" : "none";
-    document.getElementById("mck-root").scrollIntoView({ behavior: "smooth", block: "start" });
+    if(!skipScroll){
+      document.getElementById("mck-root").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   function renderCategoryStep(){
@@ -628,7 +630,7 @@
   }
 
   renderCategoryStep();
-  showStep("category");
+  showStep("category", true);
 })();
 </script>
 

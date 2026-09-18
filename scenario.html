@@ -412,7 +412,7 @@
   const optionsEl = document.getElementById("scw-options");
   const resultSlot = document.getElementById("scw-result-slot");
 
-  function renderScenario(){
+  function renderScenario(skipScroll){
     const s = scenarios[scenarioIndex];
     answered = false;
 
@@ -432,7 +432,9 @@
     resultSlot.innerHTML = "";
     renderOptions();
 
-    titleEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    if(!skipScroll){
+      titleEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   function renderOptions(){
@@ -499,7 +501,7 @@
     renderOptions();
   }
 
-  renderScenario();
+  renderScenario(true);
 })();
 </script>
 

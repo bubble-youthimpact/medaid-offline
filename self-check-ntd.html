@@ -395,11 +395,13 @@
   const stepSymptomEl = document.getElementById("ntd-step-symptom");
   const stepResultsEl = document.getElementById("ntd-step-results");
 
-  function showStep(step){
+  function showStep(step, skipScroll){
     stepCategoryEl.style.display = step === "category" ? "" : "none";
     stepSymptomEl.style.display = step === "symptom" ? "" : "none";
     stepResultsEl.style.display = step === "results" ? "" : "none";
-    document.getElementById("ntd-root").scrollIntoView({ behavior: "smooth", block: "start" });
+    if(!skipScroll){
+      document.getElementById("ntd-root").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   function renderCategoryStep(){
@@ -688,7 +690,7 @@
   }
 
   renderCategoryStep();
-  showStep("category");
+  showStep("category", true);
   flushNtdQueue();
 })();
 </script>
