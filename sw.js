@@ -1,6 +1,6 @@
 // Bump this version string any time you change any cached file.
 // It forces the service worker to re-cache everything on next load.
-const CACHE_VERSION = 'v8';
+const CACHE_VERSION = 'v9';
 const CACHE_NAME = `mck-offline-${CACHE_VERSION}`;
 
 // Every file the app needs to run with zero connection.
@@ -21,7 +21,10 @@ const PRECACHE_URLS = [
   './fonts/poppins-latin-600-normal.woff2',
   './fonts/poppins-latin-700-normal.woff2',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './icons/favicon.ico',
+  './icons/favicon-32.png',
+  './icons/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', event => {
